@@ -1,0 +1,1771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SECURAA Secure Coding Policy</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* Documentation-style A4 PDF-friendly stylesheet
+           - Heavily based on sdlc.html reference document
+           - Goal: clean, modern doc theme with consistent typography
+           - Focus: spacing, layout consistency, code block styling
+           - Compatible with wkhtmltopdf, paged.js, and browser print
+        */
+
+        /* Design tokens - mirrored from sdlc.html */
+        :root {
+          --page-width: 210mm;            /* A4 width */
+          --page-height: 297mm;           /* A4 height */
+          --page-margin: 16mm;            /* Print margin */
+          --page-max-width: calc(var(--page-width) - (var(--page-margin) * 2));
+
+          --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+          --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", "Courier New", monospace;
+
+          --base-font-size: 14px;
+          --base-line-height: 1.6;
+          --scale-rhythm: 0.95rem;
+
+          --color-text: #222831;        /* near-black for crisp print */
+          --color-muted: #556070;       /* muted copy */
+          --color-accent: #1967d2;      /* subtle corporate blue */
+          --color-border: #e6ecf2;
+          --bg-surface: #ffffff;
+
+          /* Dark code theme colors - from sdlc.html */
+          --code-bg: #0f172a;           /* deep slate */
+          --code-border: #1e293b;       /* slightly lighter border */
+          --code-text: #e5e7eb;         /* light text */
+          --code-accent: #0b897e;       /* green accent */
+
+          --quote-bg: #fbfbfd;
+
+          --radius: 6px;
+          --gap: 1rem;
+        }
+
+        /* Page size for engines that support @page - from sdlc.html */
+        @page { size: A4; margin: var(--page-margin); }
+
+        html, body {
+          height: 100%;
+          margin: 0;
+          padding: 0;
+          background: var(--bg-surface);
+          color: var(--color-text);
+          -webkit-text-size-adjust: 100%;
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+          font-family: var(--font-sans), sans-serif;
+          font-size: var(--base-font-size);
+          line-height: var(--base-line-height);
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Main page container sized for A4 printable width - from sdlc.html */
+        .page {
+          max-width: var(--page-max-width);
+          margin: 0 auto;
+          padding: 12mm 0;
+          box-sizing: border-box;
+        }
+
+        /* First-page header with logo - from sdlc.html */
+        .doc-header {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          margin-bottom: 0.6rem;
+        }
+
+        /* Dark backdrop for logo - from sdlc.html */
+        .doc-logo-wrap {
+          display: inline-block;
+          background: #343a40;
+          padding: 6px 10px;
+          border-radius: 6px;
+          line-height: 0;
+        }
+
+        .doc-logo {
+          height: 48px;
+          width: auto;
+          display: block;
+        }
+
+        /* Prevent awkward splits - from sdlc.html */
+        .page, header, footer, main, section, article { break-inside: avoid; page-break-inside: avoid; }
+
+        /* Headings — clear scale for TOC generation - from sdlc.html */
+        h1 { font-size: 1.9rem; margin: 0 0 0.4rem; font-weight: 700; letter-spacing: -0.02em; }
+        h2 { font-size: 1.35rem; margin: 1.25rem 0 0.35rem; font-weight: 600; }
+        h3 { font-size: 1.05rem; margin: 1rem 0 0.3rem; font-weight: 600; }
+        h4, h5, h6 { margin: 0.75rem 0 0.2rem; font-weight: 600; color: var(--color-muted); }
+
+        /* Heading accessibility and print safety - from sdlc.html */
+        h1,h2,h3,h4,h5,h6 { page-break-after: avoid; page-break-inside: avoid; }
+
+        /* Lead paragraph style - from sdlc.html */
+        .lead { font-size: 1.03rem; color: var(--color-muted); margin-bottom: 0.85rem; }
+
+        /* Paragraphs and spacing - from sdlc.html */
+        p { margin: 0 0 0.9rem; color: var(--color-text); orphans: 2; widows: 2; }
+        .small, .muted { color: var(--color-muted); font-size: 0.95em; }
+
+        /* Lists - from sdlc.html */
+        ul, ol { margin: 0 0 0.9rem 1.3rem; }
+        li { margin: 0.28rem 0; }
+
+        /* Table of contents - from sdlc.html */
+        .table-of-contents { margin: 0 0 1rem 0; padding: 0; }
+        .table-of-contents a { color: var(--color-accent); text-decoration: none; }
+
+        /* Tables — minimal and readable - from sdlc.html */
+        table { width: 100%; border-collapse: collapse; margin: 0.9rem 0; font-size: 0.95rem; }
+        thead th { text-align: left; padding: 0.5rem 0.6rem; background: #f8fafc; border-bottom: 1px solid var(--color-border); font-weight: 700; }
+        tbody td, thead th { border: 1px solid var(--color-border); padding: 0.45rem 0.6rem; vertical-align: top; }
+        tr { page-break-inside: avoid; }
+
+        /* Blockquote — subtle - from sdlc.html */
+        blockquote { margin: 0.8rem 0; padding: 0.65rem 0.95rem; border-left: 4px solid var(--color-border); background: var(--quote-bg); color: var(--color-muted); border-radius: 4px; }
+
+        /* Code block styling (dark theme) - from sdlc.html */
+        pre {
+          background: var(--code-bg);
+          border: 1px solid var(--code-border);
+          border-left: 6px solid var(--code-accent); /* accent strip */
+          color: var(--code-text);
+          padding: 0.8rem 0.9rem;
+          border-radius: var(--radius);
+          overflow: auto;
+          font-family: var(--font-mono), monospace;
+          font-size: 0.86rem;
+          line-height: 1.4;
+          margin: 0.9rem 0;
+          white-space: pre;
+          tab-size: 4;
+          page-break-inside: avoid;
+          -webkit-hyphens: none; hyphens: none;
+        }
+
+        /* Inline code - from sdlc.html */
+        code {
+          font-family: var(--font-mono), monospace;
+          font-size: 0.92em;
+          background: #020617;
+          color: #e5e7eb;
+          padding: 0.06rem 0.28rem;
+          border-radius: 3px;
+        }
+
+        /* Mermaid diagram placeholder */
+        .mermaid-placeholder {
+          background: #f8fafc;
+          border: 2px dashed var(--color-border);
+          border-radius: var(--radius);
+          padding: 2rem 1rem;
+          margin: 1rem 0;
+          text-align: center;
+          color: var(--color-muted);
+          font-style: italic;
+        }
+
+        /* Horizontal rule - from sdlc.html */
+        hr { border: 0; border-top: 1px solid var(--color-border); margin: 1.2rem 0; }
+
+        /* Links - from sdlc.html */
+        a { color: var(--color-accent); text-decoration: underline; }
+        a:visited { color: #164fb0; }
+
+        /* Page-break helpers for PDF - from sdlc.html */
+        header, footer, article, section, table, pre, blockquote, img, figure { break-inside: avoid; page-break-inside: avoid; -webkit-column-break-inside: avoid; }
+        h1, h2 { break-after: avoid; break-before: avoid; }
+
+        /* Print-specific adjustments - from sdlc.html */
+        @media print {
+          body { color: #000; background: #fff; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+          .page { padding: 0; }
+          pre { background: #111827; border-color: #1f2937; }
+          .mermaid-placeholder { background: transparent; }
+          a[href]:after { content: " (" attr(href) ")"; font-size: 0.85em; color: var(--color-muted); }
+        }
+
+        /* Small-screen fallbacks - from sdlc.html */
+        @media (max-width: 640px) {
+          :root { --page-margin: 12px; }
+          .page { padding: 12px; }
+          pre { font-size: 0.8rem; }
+          h1 { font-size: 1.5rem; }
+        }
+
+    </style>
+</head>
+<body>
+<div class="page">
+    <!-- CSS and structural patterns heavily based on sdlc.html -->
+    <header class="doc-header">
+        <div class="doc-logo-wrap"><img src="logo.png" alt="SECURAA logo" class="doc-logo" /></div>
+    </header>
+    <h1>SECURAA Secure Coding Policy</h1>
+    <p class="lead">Enterprise Secure Development Standards and Guidelines</p>
+    
+    <hr>
+    
+    <h2>Document Control</h2>
+    <table>
+        <thead>
+        <tr>
+            <th><strong>Document Title</strong></th>
+            <th>Secure Coding Policy</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><strong>Document ID</strong></td>
+            <td>SECURAA-SCP-001</td>
+        </tr>
+        <tr>
+            <td><strong>Version</strong></td>
+            <td>1.0</td>
+        </tr>
+        <tr>
+            <td><strong>Owner</strong></td>
+            <td>Engineering Team</td>
+        </tr>
+        <tr>
+            <td><strong>Classification</strong></td>
+            <td>Internal Use</td>
+        </tr>
+        </tbody>
+    </table>
+    
+    <hr>
+    
+    <h2>Table of Contents</h2>
+    <nav class="table-of-contents">
+        <ol>
+            <li><a href="#executive-summary">Executive Summary</a></li>
+            <li><a href="#purpose-and-scope">Purpose and Scope</a></li>
+            <li><a href="#secure-coding-principles">Secure Coding Principles</a></li>
+            <li><a href="#language-specific-guidelines">Language-Specific Guidelines</a></li>
+            <li><a href="#authentication-and-authorization">Authentication and Authorization</a></li>
+            <li><a href="#data-protection-and-encryption">Data Protection and Encryption</a></li>
+            <li><a href="#input-validation-and-output-encoding">Input Validation and Output Encoding</a></li>
+            <li><a href="#error-handling-and-logging">Error Handling and Logging</a></li>
+            <li><a href="#database-security">Database Security</a></li>
+            <li><a href="#api-security">API Security</a></li>
+            <li><a href="#third-party-dependencies">Third-Party Dependencies</a></li>
+            <li><a href="#code-review-requirements">Code Review Requirements</a></li>
+            <li><a href="#security-testing">Security Testing</a></li>
+            <li><a href="#compliance-and-enforcement">Compliance and Enforcement</a></li>
+            <li><a href="#secure-coding-for-user-interface">Secure Coding for User Interface</a></li>
+        </ol>
+    </nav>
+    
+    <hr>
+    
+    <h2 id="executive-summary">Executive Summary</h2>
+    
+    <p>This Secure Coding Policy establishes mandatory security standards and best practices for all software development activities within SECURAA. The policy ensures that security is integrated throughout the software development lifecycle, reducing vulnerabilities and protecting sensitive data.</p>
+    
+    <h3>Policy Objectives</h3>
+    
+    <ul>
+        <li><strong>Prevent Security Vulnerabilities</strong>: Proactively address common security flaws during development</li>
+        <li><strong>Protect Sensitive Data</strong>: Ensure proper handling of customer and business-critical information</li>
+        <li><strong>Ensure Compliance</strong>: Meet regulatory requirements and industry standards</li>
+        <li><strong>Standardize Practices</strong>: Provide consistent security guidelines across all development teams</li>
+        <li><strong>Enable Security Automation</strong>: Support integration of security tools in CI/CD pipelines</li>
+    </ul>
+    
+    <hr>
+    
+    <h2 id="purpose-and-scope">Purpose and Scope</h2>
+    
+    <h3>Purpose</h3>
+    
+    <p>This policy provides comprehensive secure coding guidelines for SECURAA development teams to:</p>
+    <ul>
+        <li>Minimize security vulnerabilities in application code</li>
+        <li>Establish consistent security practices across all projects</li>
+        <li>Facilitate security code reviews and assessments</li>
+        <li>Support automated security and validation</li>
+    </ul>
+    
+    <h3>Scope</h3>
+    
+    <p><strong>Applicable To:</strong></p>
+    <ul>
+        <li>All software development activities for SECURAA platform</li>
+        <li>All programming languages and frameworks in use</li>
+        <li>All developers, contractors, and third-party development partners</li>
+        <li>All code repositories and development environments</li>
+    </ul>
+    
+    <p><strong>Covered Technologies:</strong></p>
+    <ul>
+        <li><strong>Backend</strong>: Golang, Python</li>
+        <li><strong>Frontend</strong>: JavaScript, React, Node.js</li>
+        <li><strong>Databases</strong>: MongoDB, Redis, PostgreSQL</li>
+        <li><strong>Infrastructure</strong>: Docker, AWS</li>
+        <li><strong>Build Tools</strong>: Make, Shell scripts, AWS CodeBuild</li>
+    </ul>
+    
+    <hr>
+    
+    <h2 id="secure-coding-principles">Secure Coding Principles</h2>
+    
+    <h3>OWASP Top 10 Protection</h3>
+    
+    <table>
+        <thead>
+        <tr>
+            <th>OWASP Risk</th>
+            <th>Protection Measures</th>
+            <th>Implementation Status</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><strong>A01: Broken Access Control</strong></td>
+            <td>JWT validation, authorization checks</td>
+            <td>✅ Implemented</td>
+        </tr>
+        <tr>
+            <td><strong>A02: Cryptographic Failures</strong></td>
+            <td>AES-256 encryption, TLS 1.2+, secure key management</td>
+            <td>✅ Implemented</td>
+        </tr>
+        <tr>
+            <td><strong>A03: Injection</strong></td>
+            <td>Parameterized queries, input validation, ORM usage</td>
+            <td>✅ Implemented</td>
+        </tr>
+        <tr>
+            <td><strong>A04: Insecure Design</strong></td>
+            <td>Threat modeling, security requirements, design reviews</td>
+            <td>🟡 In Progress</td>
+        </tr>
+        <tr>
+            <td><strong>A05: Security Misconfiguration</strong></td>
+            <td>Hardened configs, automated scanning, secure defaults</td>
+            <td>✅ Implemented</td>
+        </tr>
+        <tr>
+            <td><strong>A06: Vulnerable Components</strong></td>
+            <td>Dependency scanning, version management, patching</td>
+            <td>🟡 In Progress</td>
+        </tr>
+        <tr>
+            <td><strong>A07: Authentication Failures</strong></td>
+            <td>MFA, secure session management, password policies</td>
+            <td>✅ Implemented</td>
+        </tr>
+        <tr>
+            <td><strong>A08: Software/Data Integrity</strong></td>
+            <td>Code signing, integrity checks, secure pipelines</td>
+            <td>🟡 In Progress</td>
+        </tr>
+        <tr>
+            <td><strong>A09: Logging Failures</strong></td>
+            <td>Comprehensive logging, secure log storage, monitoring</td>
+            <td>✅ Implemented</td>
+        </tr>
+        <tr>
+            <td><strong>A10: SSRF</strong></td>
+            <td>URL validation, network segmentation, allowlisting</td>
+            <td>✅ Implemented</td>
+        </tr>
+        </tbody>
+    </table>
+    
+    <hr>
+    
+    <h2 id="language-specific-guidelines">Language-Specific Guidelines</h2>
+    
+    <h3>Go (Golang) Secure Coding Standards</h3>
+    
+    <h4>1. Error Handling</h4>
+    
+    <p><strong>❌ INSECURE PRACTICE:</strong></p>
+    <pre><code>result, _ := someFunction()  // Ignoring errors</code></pre>
+    
+    <p><strong>✅ SECURE PRACTICE:</strong></p>
+    <pre><code>result, err := someFunction()
+if err != nil {
+    logger.Error("Failed to execute function", err.Error())
+    return fmt.Errorf("operation failed: %w", err)
+}</code></pre>
+    
+    <h4>2. SQL Injection Prevention</h4>
+    
+    <p><strong>❌ INSECURE PRACTICE:</strong></p>
+    <pre><code>query := "SELECT * FROM users WHERE username = '" + username + "'"
+db.Query(query)</code></pre>
+    
+    <p><strong>✅ SECURE PRACTICE:</strong></p>
+    <pre><code>query := "SELECT * FROM users WHERE username = $1"
+db.Query(query, username)</code></pre>
+    
+    <h4>3. Cryptographic Operations</h4>
+    
+    <p><strong>❌ INSECURE PRACTICE:</strong></p>
+    <pre><code>import "crypto/md5"  // Weak hash algorithm
+hash := md5.Sum([]byte(password))</code></pre>
+    
+    <p><strong>✅ SECURE PRACTICE:</strong></p>
+    <pre><code>import "golang.org/x/crypto/bcrypt"
+hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+if err != nil {
+    return err
+}</code></pre>
+    
+    <h4>4. MongoDB Query Security</h4>
+    
+    <p><strong>Current Implementation (securaa_lib):</strong></p>
+    <pre><code>// Secure MongoDB connection with authentication
+mongoDBDialInfo := &mgo.DialInfo{
+    Addrs:    []string{config["mongoDbHost"]},
+    Timeout:  60 * time.Second,
+    Database: config["mongoAuthDb"],
+    Username: config["mongoUserName"],
+    Password: config["mongoPassword"],
+}</code></pre>
+    
+    <p><strong>Security Requirements:</strong></p>
+    <ul>
+        <li>Always use authenticated connections</li>
+        <li>Implement connection timeouts</li>
+        <li>Use encrypted credentials (never hardcode)</li>
+        <li>Validate all query parameters</li>
+        <li>Use MongoDB's built-in parameterization</li>
+    </ul>
+    
+    <h4>5. JWT Token Handling</h4>
+    
+    <p><strong>Current Implementation (securaa):</strong></p>
+    <pre><code>import "github.com/dgrijalva/jwt-go"
+
+// Token generation must include:
+// - Expiration time
+// - Issuer validation
+// - Strong signing key
+// - Claim validation</code></pre>
+    
+    <p><strong>Security Requirements:</strong></p>
+    <ul>
+        <li>Use strong signing algorithms (e.g., RS256, HS256)</li>
+        <li>Implement token expiration (1 hour recommended)</li>
+        <li>Validate all claims on receipt</li>
+        <li>Implement token revocation mechanism</li>
+    </ul>
+    
+    <h4>6. Goroutine and Concurrency Safety</h4>
+    
+    <p><strong>✅ SECURE PRACTICE:</strong></p>
+    <pre><code>var mu sync.Mutex
+var safeMap = make(map[string]string)
+
+func updateMap(key, value string) {
+    mu.Lock()
+    defer mu.Unlock()
+    safeMap[key] = value
+}</code></pre>
+    
+    <p><strong>Requirements:</strong></p>
+    <ul>
+        <li>Use mutexes for shared data access</li>
+        <li>Implement proper defer statements for cleanup</li>
+        <li>Handle panic recovery in goroutines</li>
+    </ul>
+    
+    <p><strong>Note:</strong> For comprehensive JavaScript/React secure coding guidelines, refer to <a href="#secure-coding-for-user-interface">Section 15: Secure Coding for User Interface</a>.</p>
+    
+    <h3>Shell Script Security (Build Scripts)</h3>
+    
+    <h4>1. Input Validation</h4>
+    
+    <p><strong>❌ INSECURE PRACTICE:</strong></p>
+    <pre><code>eval $USER_INPUT  # Command injection vulnerability</code></pre>
+    
+    <p><strong>✅ SECURE PRACTICE:</strong></p>
+    <pre><code># Validate input before use
+if [[ ! "$USER_INPUT" =~ ^[a-zA-Z0-9_-]+$ ]]; then
+    echo "Invalid input"
+    exit 1
+fi</code></pre>
+    
+    <h4>2. Secure File Operations</h4>
+    
+    <p><strong>From build_securaa scripts:</strong></p>
+    <pre><code># Use absolute paths
+BUILD_LOG="/var/log/securaa/build.log"
+
+# Check file existence before operations
+if [ ! -f "$CONFIG_FILE" ]; then
+    log_and_exit "Configuration file not found"
+fi
+
+# Set appropriate permissions
+chmod 600 "$SENSITIVE_FILE"
+chown root:root "$SENSITIVE_FILE"</code></pre>
+    
+    <h4>3. Credential Management</h4>
+    
+    <p><strong>✅ SECURE PRACTICE:</strong></p>
+    <pre><code># Never hardcode credentials
+# Use environment variables or secure vaults
+MONGO_PASSWORD="${MONGO_PASSWORD:-$(aws secretsmanager get-secret-value --secret-id mongo-pwd)}"
+
+# Avoid logging sensitive information
+set +x  # Disable command echoing for sensitive operations
+mysql -u "$DB_USER" -p"$DB_PASS" < script.sql
+set -x  # Re-enable command echoing</code></pre>
+    
+    <hr>
+    
+    <h2 id="authentication-and-authorization">Authentication and Authorization</h2>
+    
+    <h3>JWT Implementation Standards</h3>
+    
+    <!-- Mermaid diagram placeholder as requested -->
+    <div class="mermaid-placeholder" data-mermaid="c2VxdWVuY2VEaWFncmFt">
+        <!--
+        sequenceDiagram
+            participant Client
+            participant API Gateway
+            participant Auth Service
+            participant Resource Service
+            participant Database
+            
+            Client->>API Gateway: Request with Credentials
+            API Gateway->>Auth Service: Validate Credentials
+            Auth Service->>Database: Verify User
+            Database-->>Auth Service: User Details
+            Auth Service->>Auth Service: Generate JWT Token
+            Auth Service-->>API Gateway: JWT Token
+            API Gateway-->>Client: Token Response
+            
+            Client->>API Gateway: Request with JWT
+            API Gateway->>API Gateway: Validate JWT Signature
+            API Gateway->>API Gateway: Check Expiration
+            API Gateway->>API Gateway: Verify Claims
+            API Gateway->>Resource Service: Authorized Request
+            Resource Service->>Database: Query Data
+            Database-->>Resource Service: Response
+            Resource Service-->>API Gateway: Data Response
+            API Gateway-->>Client: Final Response
+        -->
+        <div>[MERMAID DIAGRAM — ADD IMAGE HERE]</div>
+        <p><em>JWT Authentication Flow Sequence Diagram</em></p>
+    </div>
+    
+    <h3>Authentication Requirements</h3>
+    
+    <p><strong>Mandatory Controls:</strong></p>
+    
+    <h4>1. Password Security</h4>
+    <ul>
+        <li>Minimum 12 characters length</li>
+        <li>Complexity requirements: uppercase, lowercase, numbers, special characters</li>
+        <li>Use password hashing for storage</li>
+        <li>Implement password history (prevent reuse of last 10 passwords)</li>
+        <li>Account lockout after 5 failed attempts</li>
+    </ul>
+    
+    <h4>2. Multi-Factor Authentication (MFA)</h4>
+    <ul>
+        <li>Implement MFA for administrative access</li>
+        <li>Support TOTP (Time-based One-Time Password)</li>
+        <li>Provide backup codes for account recovery</li>
+        <li>Enforce MFA for sensitive operations</li>
+    </ul>
+    
+    <h4>3. Token Management</h4>
+    <ul>
+        <li>JWT token expiration: 1 hour for access tokens</li>
+        <li>Include issuer (iss), audience (aud), expiration (exp) claims</li>
+        <li>Implement token revocation mechanism</li>
+    </ul>
+    
+    <hr>
+    
+    <h2 id="data-protection-and-encryption">Data Protection and Encryption</h2>
+    
+    <h3>Encryption Standards</h3>
+    
+    <h4>Data at Rest</h4>
+    
+    <p><strong>Requirements:</strong></p>
+    <ul>
+        <li><strong>Algorithm</strong>: AES-256 encryption</li>
+        <li><strong>Scope</strong>: All sensitive data</li>
+    </ul>
+    
+    <p><strong>Implementation (Current - securaa_lib):</strong></p>
+    <pre><code>package encrypt_decrypt
+
+import (
+    "crypto/aes"
+    "crypto/cipher"
+    "encoding/base64"
+)
+
+func CredentialsEncrypt(stringToEncrypt string, key string) (string, error) {
+    origData := []byte(stringToEncrypt)
+    k := []byte(key)
+    
+    // AES encryption
+    block, err := aes.NewCipher(k)
+    if err != nil {
+        return "", err
+    }
+    
+    blockSize := block.BlockSize()
+    origData = PKCS7Padding(origData, blockSize)
+    blockMode := cipher.NewCBCEncrypter(block, k[:blockSize])
+    crypted := make([]byte, len(origData))
+    blockMode.CryptBlocks(crypted, origData)
+    
+    return base64.StdEncoding.EncodeToString(crypted), nil
+}</code></pre>
+    
+    <p><strong>Security Requirements:</strong></p>
+    <ul>
+        <li>Use 256-bit keys minimum</li>
+        <li>Implement proper padding (PKCS7)</li>
+        <li>Use CBC or GCM mode for block ciphers</li>
+        <li>Never reuse initialization vectors (IVs)</li>
+        <li>Securely delete decrypted data after use</li>
+    </ul>
+    
+    <h4>Data in Transit</h4>
+    
+    <p><strong>Requirements:</strong></p>
+    <ul>
+        <li><strong>Protocol</strong>: TLS 1.2 or higher (TLS 1.3 preferred)</li>
+        <li><strong>Certificate Management</strong>: Valid certificates from trusted CAs</li>
+        <li><strong>Certificate Rotation</strong>: Annual rotation minimum</li>
+    </ul>
+    
+    <p><strong>Configuration Example:</strong></p>
+    <pre><code>// TLS configuration for HTTPS servers
+tlsConfig := &tls.Config{
+    MinVersion: tls.VersionTLS12, // Minimum supported TLS version
+    MaxVersion: tls.VersionTLS13, // Maximum supported TLS version
+    PreferServerCipherSuites: true, // Prefer server's cipher suites over client's preferences
+    CipherSuites: []uint16{
+        tls.TLS_AES_128_GCM_SHA256,
+        tls.TLS_AES_256_GCM_SHA384,
+        tls.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
+        tls.TLS_CHACHA20_POLY1305_SHA256,
+        
+        // ECDHE-RSA key exchange
+        tls.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
+        tls.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
+        tls.TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256,
+        // Avoid weak or deprecated cipher suites
+        tls.TLS_FALLBACK_SCSV, // Prevents protocol downgrade attacks
+    },
+}
+
+server := &http.Server{
+    Addr:      ":443",
+    TLSConfig: tlsConfig,
+}</code></pre>
+    
+    <h3>Sensitive Data Handling</h3>
+    
+    <p><strong>Data Classification:</strong></p>
+    
+    <table>
+        <thead>
+        <tr>
+            <th>Classification</th>
+            <th>Examples</th>
+            <th>Encryption Required</th>
+            <th>Access Controls</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><strong>Critical/High</strong></td>
+            <td>Application Credentials</td>
+            <td>Yes - AES-256</td>
+            <td>Named individuals only</td>
+        </tr>
+        <tr>
+            <td><strong>Medium</strong></td>
+            <td>Business data, internal communications</td>
+            <td>Yes - TLS in transit</td>
+            <td>Authenticated users</td>
+        </tr>
+        <tr>
+            <td><strong>Low</strong></td>
+            <td>Public information, marketing content</td>
+            <td>TLS in transit</td>
+            <td>Public access allowed</td>
+        </tr>
+        </tbody>
+    </table>
+    
+    <p><strong>Handling Requirements:</strong></p>
+    <ul>
+        <li>Never log sensitive data (passwords, tokens, PII)</li>
+        <li>Mask sensitive data in logs (show only last 4 digits)</li>
+        <li>Use secure memory for sensitive operations</li>
+        <li>Implement data retention policies</li>
+    </ul>
+    
+    <hr>
+    
+    <h2 id="input-validation-and-output-encoding">Input Validation and Output Encoding</h2>
+    
+    <h3>Input Validation Framework</h3>
+    
+    <!-- Mermaid flowchart placeholder -->
+    <div class="mermaid-placeholder" data-mermaid="Zmxvd2NoYXJ0IFREMA==">
+        <!--
+        flowchart TD
+            A[Receive Input] --> B{Input Type?}
+            B -->|String| C[Length Check]
+            B -->|Number| D[Range Check]
+            B -->|Email| E[Format Validation]
+            B -->|File| F[File Type Check]
+            
+            C --> G[Character Whitelist]
+            D --> H[Type Validation]
+            E --> I[Regex Validation]
+            F --> J[Size Check]
+            
+            G --> K{Valid?}
+            H --> K
+            I --> K
+            J --> K
+            
+            K -->|No| L[Reject Input]
+            K -->|Yes| M[Sanitize Input]
+            M --> N[Encode for Context]
+            N --> O[Process Request]
+            
+            L --> P[Log Invalid Attempt]
+            P --> Q[Return Error Response]
+        -->
+        <div>[MERMAID DIAGRAM — ADD IMAGE HERE]</div>
+        <p><em>Input Validation Flow Diagram</em></p>
+    </div>
+    
+    <h3>Validation Rules</h3>
+    
+    <h4>String Input Validation</h4>
+    
+    <p><strong>✅ SECURE PRACTICE:</strong></p>
+    <pre><code>import (
+    "regexp"
+    "strings"
+)
+
+func ValidateUsername(username string) error {
+    // Length validation
+    if len(username) < 3 || len(username) > 50 {
+        return errors.New("username must be between 3 and 50 characters")
+    }
+    
+    // Character whitelist
+    validUsername := regexp.MustCompile(`^[a-zA-Z0-9_-]+$`)
+    if !validUsername.MatchString(username) {
+        return errors.New("username contains invalid characters")
+    }
+    
+    // Prevent SQL injection patterns
+    sqlPatterns := []string{"'", "\"", ";", "--", "/*", "*/", "xp_", "sp_"}
+    for _, pattern := range sqlPatterns {
+        if strings.Contains(strings.ToLower(username), pattern) {
+            return errors.New("username contains prohibited patterns")
+        }
+    }
+    
+    return nil
+}</code></pre>
+    
+    <h4>Email Validation</h4>
+    
+    <pre><code>func ValidateEmail(email string) error {
+    emailRegex := regexp.MustCompile(`^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$`)
+    if !emailRegex.MatchString(email) {
+        return errors.New("invalid email format")
+    }
+    return nil
+}</code></pre>
+    
+    <h4>URL Validation</h4>
+    
+    <pre><code>import "net/url"
+
+func ValidateURL(rawURL string) error {
+    parsedURL, err := url.Parse(rawURL)
+    if err != nil {
+        return errors.New("invalid URL format")
+    }
+    
+    // Whitelist allowed schemes
+    allowedSchemes := map[string]bool{
+        "http":  true,
+        "https": true,
+    }
+    
+    if !allowedSchemes[parsedURL.Scheme] {
+        return errors.New("unsupported URL scheme")
+    }
+    
+    // Prevent SSRF - block internal IP ranges
+    host := parsedURL.Hostname()
+    if isInternalIP(host) {
+        return errors.New("access to internal resources not allowed")
+    }
+    
+    return nil
+}</code></pre>
+    
+    <h3>Output Encoding</h3>
+    
+    <h4>JSON Context</h4>
+    
+    <pre><code>import "encoding/json"
+
+func SerializeJSON(data interface{}) ([]byte, error) {
+    // Use json.Marshal for automatic escaping
+    jsonData, err := json.Marshal(data)
+    if err != nil {
+        return nil, err
+    }
+    return jsonData, nil
+}</code></pre>
+    
+    <h4>SQL Context</h4>
+    
+    <pre><code>// Always use parameterized queries
+query := "SELECT * FROM users WHERE email = $1 AND active = $2"
+rows, err := db.Query(query, email, true)</code></pre>
+    
+    <hr>
+    
+    <h2 id="error-handling-and-logging">Error Handling and Logging</h2>
+    
+    <h3>Secure Error Handling</h3>
+    
+    <p><strong>❌ INSECURE PRACTICE:</strong></p>
+    <pre><code>func HandleLogin(w http.ResponseWriter, r *http.Request) {
+    user, err := db.GetUser(username)
+    if err != nil {
+        http.Error(w, err.Error(), 500)  // Exposes internal details
+    }
+}</code></pre>
+    
+    <p><strong>✅ SECURE PRACTICE:</strong></p>
+    <pre><code>func HandleLogin(w http.ResponseWriter, r *http.Request) {
+    user, err := db.GetUser(username)
+    if err != nil {
+        // Log detailed error internally
+        logger.Error("Database error during login", 
+            "error", err.Error(),
+            "username", username)
+        
+        // Return generic error to client
+        http.Error(w, "An error occurred. Please try again later.", 500)
+        return
+    }
+}</code></pre>
+    
+    <h3>Logging Standards</h3>
+    
+    <h4>What to Log</h4>
+    
+    <p><strong>Security Events:</strong></p>
+    <ul>
+        <li>Authentication attempts (success and failure)</li>
+        <li>Authorization failures</li>
+        <li>Input validation failures</li>
+        <li>Sensitive data access</li>
+        <li>Configuration changes</li>
+        <li>Admin actions</li>
+    </ul>
+    
+    <p><strong>Example Implementation:</strong></p>
+    <pre><code>import "go.uber.org/zap"
+
+var logger *zap.Logger
+
+func InitLogger() {
+    logger, _ = zap.NewProduction()
+    defer logger.Sync()
+}
+
+// Security event logging
+func LogSecurityEvent(eventType, username, ip, details string) {
+    logger.Info("Security Event",
+        zap.String("event_type", eventType),
+        zap.String("username", username),
+        zap.String("ip_address", ip),
+        zap.String("details", details),
+        zap.Time("timestamp", time.Now()),
+    )
+}</code></pre>
+    
+    <h4>What NOT to Log</h4>
+    
+    <p><strong>Prohibited Data:</strong></p>
+    <ul>
+        <li>Passwords or password hashes</li>
+        <li>Session tokens or JWT tokens</li>
+        <li>API keys or secrets</li>
+        <li>Credit card numbers or CVV codes</li>
+        <li>Social Security Numbers</li>
+        <li>Private encryption keys</li>
+    </ul>
+    
+    <p><strong>Sanitization Example:</strong></p>
+    <pre><code>func SanitizeForLogging(data string, fieldType string) string {
+    switch fieldType {
+    case "creditCard":
+        if len(data) > 4 {
+            return "****" + data[len(data)-4:]
+        }
+    case "email":
+        parts := strings.Split(data, "@")
+        if len(parts) == 2 && len(parts[0]) > 2 {
+            return parts[0][:2] + "***@" + parts[1]
+        }
+    case "token":
+        return "[REDACTED]"
+    }
+    return data
+}</code></pre>
+    
+    <h3>Log Security</h3>
+    
+    <p><strong>Requirements:</strong></p>
+    <ul>
+        <li>Store logs in a centralized location</li>
+        <li>Implement log rotation and retention policies</li>
+        <li>Implement access controls on log files</li>
+        <li>Monitor logs for security events</li>
+        <li>Implement log integrity verification</li>
+    </ul>
+    
+    <hr>
+    
+    <h2 id="database-security">Database Security</h2>
+    
+    <h3>MongoDB Security (Primary Database)</h3>
+    
+    <h4>Connection Security</h4>
+    
+    <p><strong>Current Implementation:</strong></p>
+    <pre><code>// From zona_batch/config/batch.conf and securaa_lib
+mongoDBDialInfo := &mgo.DialInfo{
+    Addrs:    []string{config["mongoDbHost"]},
+    Timeout:  60 * time.Second,
+    Database: config["mongoAuthDb"],
+    Username: config["mongoUserName"],
+    Password: config["mongoPassword"],
+}</code></pre>
+    
+    <p><strong>Security Requirements:</strong></p>
+    
+    <h5>1. Authentication</h5>
+    <ul>
+        <li>Always enable MongoDB authentication</li>
+        <li>Use strong passwords (16+ characters)</li>
+        <li>Implement role-based access control</li>
+        <li>Use SCRAM-SHA-256 authentication mechanism</li>
+    </ul>
+    
+    <h5>2. Connection String Security</h5>
+    <ul>
+        <li>Never hardcode credentials</li>
+        <li>Implement connection pooling with limits</li>
+    </ul>
+    
+    <h5>3. Query Security</h5>
+    <pre><code>// ❌ INSECURE - String concatenation
+query := bson.M{"username": username}  // If username is from user input
+
+// ✅ SECURE - Proper parameterization
+query := bson.M{"username": bson.M{"$eq": username}}
+
+// ✅ SECURE - Input validation before query
+if err := ValidateUsername(username); err != nil {
+    return err
+}</code></pre>
+    
+    <h4>MongoDB Security Checklist</h4>
+    
+    <ul>
+        <li>✅ Enable authentication (<code>security.authorization: enabled</code>)</li>
+        <li>✅ Use encrypted connections (TLS/SSL)</li>
+        <li>✅ Implement network access restrictions</li>
+        <li>✅ Regular updates and patching</li>
+        <li>✅ Least privilege user accounts</li>
+    </ul>
+    
+    <h3>PostgreSQL Security</h3>
+    
+    <p><strong>Connection Security:</strong></p>
+    <pre><code>import "github.com/lib/pq"
+
+// Secure PostgreSQL connection
+connStr := fmt.Sprintf(
+    "host=%s port=%s user=%s password=%s dbname=%s sslmode=require",
+    host, port, user, password, dbname,
+)
+
+db, err := sql.Open("postgres", connStr)
+if err != nil {
+    return err
+}
+
+// Set connection pool limits
+db.SetMaxOpenConns(25)
+db.SetMaxIdleConns(5)
+db.SetConnMaxLifetime(5 * time.Minute)</code></pre>
+    
+    <p><strong>Query Security:</strong></p>
+    <pre><code>// Always use parameterized queries
+query := `
+    SELECT id, username, email 
+    FROM users 
+    WHERE username = $1 AND status = $2
+`
+rows, err := db.Query(query, username, "active")</code></pre>
+    
+    <hr>
+    
+    <h2 id="api-security">API Security</h2>
+    
+    <h3>RESTful API Security Standards</h3>
+    
+    <!-- Mermaid graph placeholder -->
+    <div class="mermaid-placeholder" data-mermaid="Z3JhcGggVEI=">
+        <!--
+        graph TB
+            subgraph "API Security Layers"
+                A[Client Request] --> B[Rate Limiting]
+                B --> C[Authentication Check]
+                C --> D[Authorization Validation]
+                D --> E[Input Validation]
+                E --> F[Business Logic]
+                F --> G[Output Encoding]
+                G --> H[Response]
+            end
+            
+            subgraph "Security Controls"
+                I[API Gateway]
+                J[JWT Validation]
+                K[RBAC Engine]
+                L[WAF Rules]
+            end
+            
+            I --> B
+            J --> C
+            K --> D
+            L --> E
+        -->
+        <div>[MERMAID DIAGRAM — ADD IMAGE HERE]</div>
+        <p><em>API Security Layers Diagram</em></p>
+    </div>
+    
+    <h3>API Security Requirements</h3>
+    
+    <h4>1. Authentication</h4>
+    
+    <pre><code>// JWT middleware for API authentication
+func AuthenticateJWT(next http.Handler) http.Handler {
+    return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+        authHeader := r.Header.Get("Authorization")
+        if authHeader == "" {
+            http.Error(w, "Missing authorization header", http.StatusUnauthorized)
+            return
+        }
+        
+        tokenString := strings.TrimPrefix(authHeader, "Bearer ")
+        token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+            // Validate signing method
+            if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+                return nil, fmt.Errorf("unexpected signing method")
+            }
+            return []byte(jwtSecret), nil
+        })
+        
+        if err != nil || !token.Valid {
+            http.Error(w, "Invalid token", http.StatusUnauthorized)
+            return
+        }
+        
+        // Add claims to context
+        claims := token.Claims.(jwt.MapClaims)
+        ctx := context.WithValue(r.Context(), "claims", claims)
+        next.ServeHTTP(w, r.WithContext(ctx))
+    })
+}</code></pre>
+    
+    <h4>2. API Security Checklist</h4>
+    
+    <ul>
+        <li>✅ Implement authentication for all endpoints</li>
+        <li>✅ Use HTTPS for all API communications</li>
+        <li>✅ Validate and sanitize all inputs</li>
+        <li>✅ Use appropriate HTTP status codes</li>
+        <li>✅ Implement proper error handling</li>
+        <li>✅ Version your APIs</li>
+        <li>✅ Implement API logging and monitoring</li>
+        <li>✅ Use security headers (HSTS, CSP, etc.)</li>
+        <li>✅ Implement request/response validation</li>
+    </ul>
+    
+    <hr>
+    
+    <h2 id="third-party-dependencies">Third-Party Dependencies</h2>
+    
+    <h3>Dependency Management</h3>
+    
+    <h4>Go Modules (go.mod)</h4>
+    
+    <p><strong>Current Dependencies Analysis:</strong></p>
+    <pre><code>// From securaa/go.mod
+- github.com/dgrijalva/jwt-go v3.2.0 (⚠️ Deprecated - Update Required)
+- gopkg.in/mgo.v2 (⚠️ Unmaintained - Consider migration)
+- go.uber.org/zap v1.21.0 (✅ Active)
+- github.com/gorilla/mux v1.8.0 (✅ Active)</code></pre>
+    
+    <p><strong>Security Requirements:</strong></p>
+    
+    <h5>1. Vulnerability Scanning</h5>
+    <pre><code># Run security scan on dependencies
+go list -json -m all | nancy sleuth
+
+# Or use govulncheck
+govulncheck ./...</code></pre>
+    
+    <h5>2. Dependency Updates</h5>
+    <pre><code># Check for updates
+go list -u -m all
+
+# Update dependencies
+go get -u ./...
+go mod tidy</code></pre>
+    
+    <h5>3. Version Pinning</h5>
+    <pre><code>// In go.mod, use specific versions
+require (
+    github.com/gorilla/mux v1.8.0  // Pinned version
+    go.uber.org/zap v1.21.0
+)</code></pre>
+    
+    <h3>Third-Party Component Security Checklist</h3>
+    
+    <ul>
+        <li>✅ Maintain inventory of all dependencies</li>
+        <li>✅ Regular vulnerability scanning (weekly minimum)</li>
+        <li>✅ Automated dependency updates</li>
+        <li>✅ Security advisory monitoring</li>
+        <li>✅ License compliance verification</li>
+        <li>✅ Source code review for critical dependencies</li>
+        <li>✅ Vendor security assessment</li>
+        <li>✅ Dependency isolation and sandboxing</li>
+    </ul>
+    
+    <hr>
+    
+    <h2 id="code-review-requirements">Code Review Requirements</h2>
+    
+    <h3>Mandatory Code Review Process</h3>
+    
+    <!-- Mermaid flowchart placeholder -->
+    <div class="mermaid-placeholder" data-mermaid="Zmxvd2NoYXJ0IFRCA==">
+        <!--
+        flowchart TB
+            A["Developer Completes Code"] --> B["Run Local Tests"]
+            B --> C["Developer Security Check"]
+            C --> D["Create Pull Request"]
+            D --> E["Peer Code Review"]
+            E --> F{"Review Approved?"}
+            F -- No --> G["Address Comments"]
+            G --> E
+            F -- Yes --> H{"High Risk Code?"}
+            H -- Yes --> I["Security Reviewer Check"]
+            I --> J{"Security Approved?"}
+            J -- No --> G
+            J -- Yes --> K["Merge to Dev Branch"]
+            H -- No --> K
+            K --> L["Deploy to Nightly"]
+        -->
+        <div>[MERMAID DIAGRAM — ADD IMAGE HERE]</div>
+        <p><em>Code Review Process Flow Diagram</em></p>
+    </div>
+    
+    <h3>Code Review Checklist</h3>
+    
+    <h4>Security Review Items</h4>
+    
+    <p><strong>Authentication & Authorization:</strong></p>
+    <ul>
+        <li>[ ] Authentication required for all sensitive operations</li>
+        <li>[ ] Authorization checks implemented for all resources</li>
+        <li>[ ] Session management properly implemented</li>
+        <li>[ ] Passwords properly hashed (never stored in plain text)</li>
+        <li>[ ] JWT tokens properly validated</li>
+    </ul>
+    
+    <p><strong>Input Validation:</strong></p>
+    <ul>
+        <li>[ ] All user inputs validated and sanitized</li>
+        <li>[ ] Whitelist validation used where possible</li>
+        <li>[ ] File uploads validated (type, size, content)</li>
+        <li>[ ] DB injection prevention (parameterized queries)</li>
+        <li>[ ] XSS prevention (output encoding)</li>
+    </ul>
+    
+    <p><strong>Data Protection:</strong></p>
+    <ul>
+        <li>[ ] Sensitive data encrypted at rest</li>
+        <li>[ ] TLS/SSL used for data in transit</li>
+        <li>[ ] Credentials stored securely (never hardcoded)</li>
+    </ul>
+    
+    <p><strong>Error Handling:</strong></p>
+    <ul>
+        <li>[ ] Errors handled gracefully without exposing internals</li>
+        <li>[ ] Sensitive information not logged</li>
+        <li>[ ] Generic error messages returned to clients</li>
+        <li>[ ] Detailed errors logged for debugging</li>
+    </ul>
+    
+    <h3>High-Risk Code Areas</h3>
+    
+    <p>Require additional seniors team review:</p>
+    <ul>
+        <li>Authentication and authorization logic</li>
+        <li>Cryptographic implementations</li>
+        <li>File upload/download functionality</li>
+        <li>Database query construction</li>
+        <li>API endpoint implementations</li>
+        <li>External service integrations</li>
+    </ul>
+    
+    <hr>
+    
+    <h2 id="security-testing">Security Testing</h2>
+    
+    <h3>Static Application Security Testing (SAST)</h3>
+    
+    <p><strong>Tools and Implementation:</strong></p>
+    <pre><code># GoSec - Go security checker
+gosec -fmt=json -out=results.json ./...
+
+# Go vet - Built-in static analysis
+go vet ./...
+
+# Staticcheck - Additional static analysis
+staticcheck ./...</code></pre>
+    
+    <h3>Dependency Scanning</h3>
+    
+    <pre><code># Nancy - Dependency vulnerability scanner
+go list -json -m all | nancy sleuth
+
+# Govulncheck - Official Go vulnerability checker
+govulncheck ./...</code></pre>
+    
+    <h3>Testing Schedule</h3>
+    
+    <table>
+        <thead>
+        <tr>
+            <th>Test Type</th>
+            <th>Frequency</th>
+            <th>Automation</th>
+            <th>Responsibility</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><strong>Unit Tests</strong></td>
+            <td>Every commit</td>
+            <td>No</td>
+            <td>Developers</td>
+        </tr>
+        <tr>
+            <td><strong>Integration Tests</strong></td>
+            <td>Every commit</td>
+            <td>No</td>
+            <td>Developers</td>
+        </tr>
+        <tr>
+            <td><strong>SAST</strong></td>
+            <td>Daily</td>
+            <td>Yes</td>
+            <td>CI/CD Pipeline</td>
+        </tr>
+        <tr>
+            <td><strong>Dependency Scan</strong></td>
+            <td>Daily</td>
+            <td>Yes</td>
+            <td>CI/CD Pipeline</td>
+        </tr>
+        </tbody>
+    </table>
+    
+    <hr>
+    
+    <h2 id="compliance-and-enforcement">Compliance and Enforcement</h2>
+    
+    <h3>Policy Compliance</h3>
+    
+    <p><strong>Enforcement Mechanisms:</strong></p>
+    
+    <h4>1. Automated Checks</h4>
+    <ul>
+        <li>CI/CD pipeline security gates via gosec</li>
+    </ul>
+    
+    <h4>2. Manual Reviews</h4>
+    <ul>
+        <li>Peer code reviews (mandatory)</li>
+        <li>Senior engineering team reviews (high-risk code)</li>
+        <li>Architecture security reviews</li>
+        <li>Annual security audits</li>
+    </ul>
+    
+    <h4>3. Training Requirements</h4>
+    <ul>
+        <li>Secure coding training (annual)</li>
+        <li>OWASP Top 10 awareness</li>
+        <li>Language-specific security training</li>
+    </ul>
+    
+    <h3>Metrics and Reporting</h3>
+    
+    <p><strong>Security Metrics from GoSec:</strong></p>
+    <ul>
+        <li>Number of security issues by severity</li>
+        <li>Time to remediate security issues</li>
+        <li>Security test coverage percentage</li>
+        <li>Dependency vulnerability count</li>
+    </ul>
+    
+    <p><strong>Monthly Security Report:</strong></p>
+    <ul>
+        <li>Security issues identified and resolved</li>
+        <li>Training completion status</li>
+        <li>Recommendations for improvement</li>
+    </ul>
+    
+    <hr>
+    
+    <h2 id="secure-coding-for-user-interface">Secure Coding for User Interface</h2>
+    
+    <p>This section provides comprehensive secure coding guidelines specifically for the Securaa UI platform (React/JavaScript frontend). These guidelines complement the general secure coding principles and provide UI-specific security measures and implementations.</p>
+    
+    <h3>Authentication & Access Control</h3>
+    
+    <h4>Strong Password Requirements</h4>
+    <p>The platform enforces robust password policies to ensure account security:</p>
+    
+    <ul>
+        <li><strong>Minimum Length:</strong> 8 characters</li>
+        <li><strong>Complexity Requirements:</strong>
+            <ul>
+                <li>At least one uppercase letter (A-Z)</li>
+                <li>At least one lowercase letter (a-z)</li>
+                <li>At least one number (0-9)</li>
+                <li>At least one special character (!@#$%^&*)</li>
+            </ul>
+        </li>
+        <li><strong>Password Confirmation:</strong> Users must confirm passwords to prevent typing errors</li>
+        <li><strong>Password Validation:</strong> Real-time validation provides immediate feedback on password strength</li>
+    </ul>
+    
+    <p><strong>Example Implementation:</strong></p>
+    <p>The platform uses the following regex pattern for password validation:</p>
+    <pre><code>/^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,40}$/</code></pre>
+    <p>This pattern is enforced across all password-related components (user registration, password change, password reset) to ensure consistent security standards.</p>
+    
+    <h4>Secure Authentication</h4>
+    <ul>
+        <li><strong>Token-Based Authentication:</strong> All user sessions use secure token-based authentication</li>
+        <li><strong>Encrypted Credentials:</strong> Authentication credentials are encrypted before storage using AES encryption</li>
+        <li><strong>Session Management:</strong> Secure session handling with automatic timeout protection</li>
+    </ul>
+    
+    <p><strong>Example Implementation:</strong></p>
+    <p>Authentication tokens are stored in encrypted cookies using AES encryption. The encryption key is configured via environment variables (see <code>.env</code> configuration). All API requests include authentication tokens in headers to ensure secure access to protected resources.</p>
+    
+    <h3>Data Protection</h3>
+    
+    <h4>Encryption</h4>
+    <ul>
+        <li><strong>Data Encryption:</strong> Sensitive data is encrypted using industry-standard AES encryption</li>
+        <li><strong>Secure Storage:</strong> Authentication tokens and sensitive information are stored securely</li>
+        <li><strong>Data in Transit:</strong> All data transmission is protected using HTTPS/TLS encryption</li>
+    </ul>
+    
+    <p><strong>Configuration Note:</strong> Encryption keys are stored in environment variables (<code>.env</code> file) and accessed via <code>REACT_APP_ENCRYPTION_KEY</code> and <code>REACT_APP_API_KEY</code>. This ensures that sensitive keys are not hardcoded in the source code and can be configured per environment (development, staging, production).</p>
+    
+    <p><strong>Example Implementation:</strong></p>
+    <p>The platform uses AES encryption in CBC mode with PKCS7 padding and random Initialization Vectors (IV) for enhanced security:</p>
+    
+    <pre><code>// Encryption function using AES with random IV
+export function encrypt(data) {
+    // Generate a random IV for each encryption
+    const iv = CryptoJS.lib.WordArray.random(16);
+    
+    // Encrypt using AES in CBC mode with PKCS7 padding
+    const encrypted = CryptoJS.AES.encrypt(data, key, {
+        iv: iv,
+        mode: CryptoJS.mode.CBC,
+        padding: CryptoJS.pad.Pkcs7,
+    });
+    
+    // Combine IV and ciphertext for secure storage
+    const combinedData = iv.concat(encrypted.ciphertext).toString(CryptoJS.enc.Base64);
+    return combinedData;
+}
+
+// Decryption function
+export function decrypt(encryptedData) {
+    // Extract IV and ciphertext
+    const rawData = CryptoJS.enc.Base64.parse(encryptedData);
+    const iv = CryptoJS.lib.WordArray.create(rawData.words.slice(0, 4));
+    const ciphertext = CryptoJS.lib.WordArray.create(rawData.words.slice(4));
+    
+    // Decrypt using the same key and IV
+    const decrypted = CryptoJS.AES.decrypt({ ciphertext: ciphertext }, key, {
+        iv: iv,
+        mode: CryptoJS.mode.CBC,
+        padding: CryptoJS.pad.Pkcs7,
+    });
+    
+    return decrypted.toString(CryptoJS.enc.Utf8);
+}</code></pre>
+    
+    <p>The encryption key is loaded from environment variables: <code>const key = CryptoJS.enc.Utf8.parse(process.env.REACT_APP_API_KEY)</code></p>
+    
+    <h4>Secure Data Handling</h4>
+    <ul>
+        <li><strong>Encrypted Cookies:</strong> Authentication tokens stored in encrypted cookies</li>
+        <li><strong>Secure Session Storage:</strong> User session data stored securely</li>
+        <li><strong>Automatic Cleanup:</strong> Sensitive data automatically cleared on logout or session expiration</li>
+    </ul>
+    
+    <p><strong>Example Implementation:</strong></p>
+    <p>All cookie values are encrypted before storage to protect sensitive authentication tokens and user data:</p>
+    
+    <pre><code>// Cookie encryption before storage
+setCookie: function (cname, cvalue, exdays) {
+    if (cname !== "tenantcode") {
+        cvalue = typeof cvalue === 'undefined' ? '' : cvalue;
+        let data = encrypt(cvalue.toString());  // Encrypt before storing
+        document.cookie = cname + "=" + data + ";" + ";path=/";
+    }
+}
+
+// Cookie decryption when retrieving
+getCookie: function (cname) {
+    let name = cname + "=";
+    let decodedCookie = decodeURIComponent(document.cookie);
+    // ... extract cookie value ...
+    let data = decrypt(data);  // Decrypt when retrieving
+    return data;
+}</code></pre>
+    
+    <p>This ensures that even if cookies are intercepted, the data remains protected through AES encryption.</p>
+    
+    <h3>Input Validation & Sanitization</h3>
+    
+    <h4>Comprehensive Input Validation</h4>
+    <p>The platform validates all user inputs to prevent security vulnerabilities:</p>
+    
+    <ul>
+        <li><strong>Email Validation:</strong> Strict email format validation with support for multiple recipients</li>
+        <li><strong>Text Field Validation:</strong> Alphanumeric validation for names and text fields</li>
+        <li><strong>URL Validation:</strong> Secure URL format validation for web addresses</li>
+        <li><strong>Numeric Validation:</strong> Range and type validation for numeric inputs</li>
+        <li><strong>Query Sanitization:</strong> Search queries are sanitized to prevent injection attacks</li>
+    </ul>
+    
+    <p><strong>Example Implementation:</strong></p>
+    <p>Email validation uses the regex pattern: <code>/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/</code> to ensure proper email format. Text fields for names use <code>/^[a-zA-Z ]*$/i</code> to allow only alphabetic characters and spaces, preventing injection of malicious code.</p>
+    
+    <h4>Real-Time Validation</h4>
+    <ul>
+        <li><strong>Immediate Feedback:</strong> Users receive instant validation feedback</li>
+        <li><strong>Clear Error Messages:</strong> User-friendly error messages guide correct input</li>
+        <li><strong>Preventive Measures:</strong> Invalid inputs are blocked before submission</li>
+    </ul>
+    
+    <h3>Secure Communication</h3>
+    
+    <h4>HTTPS/TLS Encryption</h4>
+    <ul>
+        <li><strong>Forced HTTPS:</strong> All communications are encrypted using HTTPS</li>
+        <li><strong>TLS/SSL:</strong> Industry-standard encryption protocols protect data in transit</li>
+        <li><strong>Certificate Management:</strong> Secure certificate handling and validation</li>
+    </ul>
+    
+    <h4>API Security</h4>
+    <ul>
+        <li><strong>Authenticated Requests:</strong> All API requests require valid authentication tokens</li>
+        <li><strong>Secure Headers:</strong> Proper security headers on all API communications</li>
+        <li><strong>Token Management:</strong> Secure token handling and rotation</li>
+    </ul>
+    
+    <p><strong>Configuration Note:</strong> API endpoints are configured via environment variables (<code>.env</code> file) using <code>REACT_APP_API_URL</code>. This allows different API endpoints for different environments without hardcoding URLs in the source code.</p>
+    
+    <h3>Code Execution Security</h3>
+    
+    <h4>Custom Code Validation</h4>
+    <p>For platforms that allow custom code execution (e.g., Python scripts):</p>
+    
+    <ul>
+        <li><strong>Dangerous Command Blocking:</strong> System-level commands are blocked to prevent unauthorized access</li>
+        <li><strong>Code Validation:</strong> All custom code is validated before execution</li>
+        <li><strong>Template Protection:</strong> Critical code templates are protected from deletion</li>
+        <li><strong>Sandboxed Execution:</strong> Code execution is restricted to prevent system access</li>
+    </ul>
+    
+    <p><strong>Example Implementation:</strong></p>
+    <p>The platform scans custom Python code for dangerous patterns before execution. Commands like <code>os.</code> and <code>subprocess.</code> are blocked to prevent system-level access. The validation process checks each line of code and prevents execution if dangerous patterns are detected, notifying users with clear error messages.</p>
+    
+    <h4>Security Controls</h4>
+    <ul>
+        <li><strong>Pre-Execution Validation:</strong> Code is scanned for dangerous patterns before running</li>
+        <li><strong>Error Prevention:</strong> Users are notified when potentially dangerous code is detected</li>
+        <li><strong>Template Integrity:</strong> Default code templates cannot be removed, ensuring security baseline</li>
+    </ul>
+    
+    <h3>Session Management</h3>
+    
+    <h4>Secure Session Handling</h4>
+    <ul>
+        <li><strong>Session Timeout:</strong> Automatic session expiration after inactivity (configurable timeout duration)</li>
+        <li><strong>Session Extension:</strong> Secure session extension mechanism with user notification</li>
+        <li><strong>Token Refresh:</strong> Automatic token refresh to maintain secure sessions</li>
+        <li><strong>Secure Logout:</strong> Complete session cleanup on logout</li>
+    </ul>
+    
+    <p><strong>Example Implementation:</strong></p>
+    <p>The platform implements session timeout monitoring that checks session expiration time and warns users when their session is about to expire (typically 5 minutes before expiration). Users can extend their session securely, and all session data is automatically cleared when the session expires or the user logs out.</p>
+    
+    <p><strong>Configuration Note:</strong> Session timeout duration is configurable through system settings and can be managed per deployment. Default session timeout values can be configured via environment variables if needed.</p>
+    
+    <h4>Session Protection</h4>
+    <ul>
+        <li><strong>Automatic Cleanup:</strong> All session data cleared on timeout or logout</li>
+        <li><strong>Token Expiration:</strong> Secure handling of expired authentication tokens</li>
+        <li><strong>Multi-Session Support:</strong> Secure handling of multiple concurrent sessions</li>
+    </ul>
+    
+    <h3>Security Headers & Browser Protection</h3>
+    
+    <h4>HTTP Security Headers</h4>
+    <p>The platform implements multiple security headers to protect against common web vulnerabilities:</p>
+    
+    <ul>
+        <li><strong>Strict Transport Security (HSTS):</strong> Forces secure HTTPS connections with <code>max-age=31536000; includeSubDomains</code></li>
+        <li><strong>Content Security Policy (CSP):</strong> Restricts resource loading to prevent XSS attacks</li>
+        <li><strong>Frame Protection:</strong> Prevents clickjacking attacks via <code>X-Frame-Options: SAMEORIGIN</code></li>
+        <li><strong>Content Type Protection:</strong> Prevents MIME type sniffing attacks via <code>X-Content-Type-Options: nosniff</code></li>
+        <li><strong>Referrer Policy:</strong> Controls information sharing in HTTP referrers with <code>strict-origin-when-cross-origin</code></li>
+        <li><strong>Permissions Policy:</strong> Restricts access to browser features (camera, microphone, geolocation)</li>
+    </ul>
+    
+    <p><strong>Example Implementation:</strong></p>
+    <p>These security headers are configured in the web server configuration (Nginx) to ensure all HTTP responses include the necessary security headers. The HSTS header forces browsers to use HTTPS for all future connections to the domain for one year.</p>
+    
+    <h4>Browser Security</h4>
+    <ul>
+        <li><strong>XSS Protection:</strong> Multiple layers of protection against cross-site scripting</li>
+        <li><strong>Clickjacking Prevention:</strong> Protection against UI redressing attacks</li>
+        <li><strong>MIME Sniffing Prevention:</strong> Prevents content type confusion attacks</li>
+    </ul>
+    
+    <h3>Compliance & Best Practices</h3>
+    
+    <h4>Security Standards</h4>
+    <p>The platform follows industry best practices and security standards:</p>
+    
+    <ul>
+        <li><strong>OWASP Guidelines:</strong> Adherence to OWASP security recommendations, including OWASP Top 10 security risks</li>
+        <li><strong>Secure Coding Practices:</strong> Implementation of secure coding standards with input validation, output encoding, and secure authentication</li>
+        <li><strong>Regular Security Reviews:</strong> Ongoing security assessment and improvement</li>
+    </ul>
+    
+    <p><strong>Example Implementation:</strong></p>
+    <p>Following OWASP guidelines, the platform implements defense-in-depth strategies including:</p>
+    <ul>
+        <li>Input validation at multiple layers (client-side and server-side)</li>
+        <li>Secure password storage and transmission</li>
+        <li>Protection against common vulnerabilities like SQL injection, XSS, and CSRF</li>
+        <li>Secure session management with proper timeout and cleanup mechanisms</li>
+    </ul>
+    
+    <h4>Data Protection</h4>
+    <ul>
+        <li><strong>Privacy Protection:</strong> User data is handled according to privacy best practices</li>
+        <li><strong>Secure Storage:</strong> Sensitive data stored using encryption</li>
+        <li><strong>Access Control:</strong> Role-based access control for different user types</li>
+    </ul>
+    
+    <h4>Monitoring & Maintenance</h4>
+    <ul>
+        <li><strong>Error Handling:</strong> Secure error handling that doesn't expose sensitive information</li>
+        <li><strong>Logging:</strong> Security event logging for audit and monitoring</li>
+        <li><strong>Regular Updates:</strong> Security updates and patches applied regularly</li>
+    </ul>
+    
+    <h3>Security Features Summary</h3>
+    
+    <h4>✅ Implemented Security Measures</h4>
+    
+    <table>
+        <thead>
+        <tr>
+            <th>Security Area</th>
+            <th>Protection Level</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><strong>Authentication</strong></td>
+            <td>Strong password policy, token-based auth, encrypted storage</td>
+        </tr>
+        <tr>
+            <td><strong>Data Protection</strong></td>
+            <td>AES encryption, HTTPS/TLS, secure storage</td>
+        </tr>
+        <tr>
+            <td><strong>Input Validation</strong></td>
+            <td>Comprehensive validation for all input types</td>
+        </tr>
+        <tr>
+            <td><strong>Session Management</strong></td>
+            <td>Secure sessions, automatic timeout, secure logout</td>
+        </tr>
+        <tr>
+            <td><strong>Code Execution</strong></td>
+            <td>Validation, dangerous command blocking, template protection</td>
+        </tr>
+        <tr>
+            <td><strong>Browser Security</strong></td>
+            <td>Multiple security headers, XSS protection, clickjacking prevention</td>
+        </tr>
+        <tr>
+            <td><strong>API Security</strong></td>
+            <td>Token authentication, HTTPS, secure headers</td>
+        </tr>
+        </tbody>
+    </table>
+    
+    <h3>Environment Variables & Configuration</h3>
+    
+    <h4>Secure Configuration Management</h4>
+    <p>The Securaa UI platform uses environment variables (<code>.env</code> file) to manage sensitive configuration values. This approach ensures that sensitive data is not hardcoded in the source code and can be configured per environment.</p>
+    
+    <h4>Key Environment Variables</h4>
+    <p>The following environment variables are used for security-related configuration:</p>
+    
+    <ul>
+        <li><strong><code>REACT_APP_ENCRYPTION_KEY</code></strong>: Encryption key used for AES encryption of sensitive data (stored in cookies, session data)</li>
+        <li><strong><code>REACT_APP_API_KEY</code></strong>: API key used for secure API communications</li>
+        <li><strong><code>REACT_APP_API_URL</code></strong>: Base URL for API endpoints (allows different endpoints per environment)</li>
+    </ul>
+    
+    <p><strong>Note:</strong> All environment variables prefixed with <code>REACT_APP_</code> are accessible in the React application. These values should be kept secure and never committed to version control. The <code>.env</code> file is excluded from version control via <code>.gitignore</code>.</p>
+    
+    <h4>Configuration Best Practices</h4>
+    <ul>
+        <li>Environment-specific configuration files (<code>.env.development</code>, <code>.env.production</code>)</li>
+        <li>Secure secret management in production environments</li>
+        <li>Regular rotation of encryption keys and API keys</li>
+        <li>Never expose environment variables in client-side code that shouldn't be public</li>
+    </ul>
+    
+    <hr>
+    
+    <h2>Conclusion</h2>
+    
+    <p>This Secure Coding Policy establishes the foundation for secure software development at SECURAA. All development team members must adhere to these guidelines to ensure the security and integrity of the SECURAA platform.</p>
+    
+    <p><strong>Key Takeaways:</strong></p>
+    <ul>
+        <li>Security is everyone's responsibility</li>
+        <li>Implement defense in depth</li>
+        <li>Validate all inputs, encode all outputs</li>
+        <li>Use secure defaults and fail securely</li>
+        <li>Keep dependencies up to date</li>
+        <li>Continuous learning and improvement</li>
+    </ul>
+    
+    <hr>
+    
+    <h2>Appendices</h2>
+    
+    <h3>Appendix A: Security Tools and Resources</h3>
+    
+    <p><strong>Recommended Tools:</strong></p>
+    <ul>
+        <li><strong>SAST</strong>: GoSec</li>
+        <li><strong>Dependency Scanning</strong>: govulncheck</li>
+    </ul>
+    
+    <h3>Appendix B: References</h3>
+    
+    <ul>
+        <li>OWASP Top 10: https://owasp.org/www-project-top-ten/</li>
+        <li>CWE Top 25: https://cwe.mitre.org/top25/</li>
+        <li>NIST Secure Software Development Framework</li>
+        <li>ISO 27034 - Application Security Standard</li>
+    </ul>
+    
+    <hr>
+    
+    <h2>Document Approval</h2>
+    
+    <table>
+        <thead>
+        <tr>
+            <th>Role</th>
+            <th>Name</th>
+            <th>Signature</th>
+            <th>Date</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><strong>Engineering Leads</strong></td>
+            <td>[Name]</td>
+            <td>[Digital Signature]</td>
+            <td>[Date]</td>
+        </tr>
+        <tr>
+            <td><strong>Architect</strong></td>
+            <td>[Name]</td>
+            <td>[Digital Signature]</td>
+            <td>[Date]</td>
+        </tr>
+        </tbody>
+    </table>
+    
+    <hr>
+    
+    <p><em>This document contains confidential and proprietary information. Distribution is restricted to authorized personnel only.</em></p>
+    
+    <!-- Comment: HTML structure, CSS styling, and layout patterns heavily based on sdlc.html reference document -->
+    <!-- All typography, spacing, code block styling, and table formatting mirrors sdlc.html for visual consistency -->
+    <!-- Mermaid diagrams replaced with placeholders as requested, preserving original code in comments -->
+    
+</div>
+</body>
+</html>
