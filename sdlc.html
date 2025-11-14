@@ -1,0 +1,1460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SECURAA Complete Secure SDLC Process Documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* Documentation-style A4 PDF-friendly stylesheet
+           - Goal: clean, modern doc theme inspired by reference template
+           - Focus: typography, spacing, layout consistency, code block styling
+           - Remains lightweight and compatible with wkhtmltopdf, paged.js, and browser print
+        */
+
+        /* Design tokens */
+        :root {
+          --page-width: 210mm;            /* A4 width */
+          --page-height: 297mm;           /* A4 height */
+          --page-margin: 16mm;            /* Print margin (adjustable) */
+          --page-max-width: calc(var(--page-width) - (var(--page-margin) * 2));
+
+          --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+          --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", "Courier New", monospace;
+
+          --base-font-size: 14px;
+          --base-line-height: 1.6;
+          --scale-rhythm: 0.95rem;
+
+          --color-text: #222831;        /* near-black for crisp print */
+          --color-muted: #556070;       /* muted copy */
+          --color-accent: #1967d2;      /* subtle corporate blue */
+          --color-border: #e6ecf2;
+          --bg-surface: #ffffff;
+
+          /* Dark code theme colors */
+          --code-bg: #0f172a;           /* deep slate */
+          --code-border: #1e293b;       /* slightly lighter border */
+          --code-text: #e5e7eb;         /* light text */
+          --code-accent: #0b897e;       /* green accent (from logo) */
+
+          --quote-bg: #fbfbfd;
+
+          --radius: 6px;
+          --gap: 1rem;
+        }
+
+        /* Page size for engines that support @page */
+        @page { size: A4; margin: var(--page-margin); }
+
+        html, body {
+          height: 100%;
+          margin: 0;
+          padding: 0;
+          background: var(--bg-surface);
+          color: var(--color-text);
+          -webkit-text-size-adjust: 100%;
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+          font-family: var(--font-sans), sans-serif;
+          font-size: var(--base-font-size);
+          line-height: var(--base-line-height);
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Main page container sized for A4 printable width */
+        .page {
+          max-width: var(--page-max-width);
+          margin: 0 auto;
+          padding: 12mm 0; /* vertical breathing; horizontal margins handled by @page */
+          box-sizing: border-box;
+        }
+
+        /* First-page header with logo (appears above the H1) */
+        .doc-header {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          margin-bottom: 0.6rem;
+        }
+
+        /* Dark backdrop for logo to improve contrast */
+        .doc-logo-wrap {
+          display: inline-block;
+          background: #343a40; /* requested dark background */
+          padding: 6px 10px;
+          border-radius: 6px;
+          line-height: 0;
+        }
+
+        .doc-logo {
+          height: 48px;
+          width: auto;
+          display: block;
+        }
+
+        /* Prevent awkward splits */
+        .page, header, footer, main, section, article { break-inside: avoid; page-break-inside: avoid; }
+
+        /* Headings — clear scale for TOC generation */
+        h1 { font-size: 1.9rem; margin: 0 0 0.4rem; font-weight: 700; letter-spacing: -0.02em; }
+        h2 { font-size: 1.35rem; margin: 1.25rem 0 0.35rem; font-weight: 600; }
+        h3 { font-size: 1.05rem; margin: 1rem 0 0.3rem; font-weight: 600; }
+        h4, h5, h6 { margin: 0.75rem 0 0.2rem; font-weight: 600; color: var(--color-muted); }
+
+        /* Heading accessibility and print safety */
+        h1,h2,h3,h4,h5,h6 { page-break-after: avoid; page-break-inside: avoid; }
+
+        /* Lead paragraph style */
+        .lead { font-size: 1.03rem; color: var(--color-muted); margin-bottom: 0.85rem; }
+
+        /* Paragraphs and spacing */
+        p { margin: 0 0 0.9rem; color: var(--color-text); orphans: 2; widows: 2; }
+        .small, .muted { color: var(--color-muted); font-size: 0.95em; }
+
+        /* Lists */
+        ul, ol { margin: 0 0 0.9rem 1.3rem; }
+        li { margin: 0.28rem 0; }
+
+        /* Table of contents preserved in place (styling only) */
+        .table-of-contents { margin: 0 0 1rem 0; padding: 0; }
+        .table-of-contents a { color: var(--color-accent); text-decoration: none; }
+
+        /* Tables — minimal and readable */
+        table { width: 100%; border-collapse: collapse; margin: 0.9rem 0; font-size: 0.95rem; }
+        thead th { text-align: left; padding: 0.5rem 0.6rem; background: #f8fafc; border-bottom: 1px solid var(--color-border); font-weight: 700; }
+        tbody td, thead th { border: 1px solid var(--color-border); padding: 0.45rem 0.6rem; vertical-align: top; }
+        tr { page-break-inside: avoid; }
+
+        /* Blockquote — subtle */
+        blockquote { margin: 0.8rem 0; padding: 0.65rem 0.95rem; border-left: 4px solid var(--color-border); background: var(--quote-bg); color: var(--color-muted); border-radius: 4px; }
+
+        /* ----------------------------------------------------------------- */
+        /* Code block styling (dark theme)                                    */
+        /* - simple dark background, high-contrast text, no line numbers     */
+        /* ----------------------------------------------------------------- */
+        pre {
+          background: var(--code-bg);
+          border: 1px solid var(--code-border);
+          border-left: 6px solid var(--code-accent); /* accent strip */
+          color: var(--code-text);
+          padding: 0.8rem 0.9rem;
+          border-radius: var(--radius);
+          overflow: auto;
+          font-family: var(--font-mono), monospace;
+          font-size: 0.86rem;
+          line-height: 1.4;
+          margin: 0.9rem 0;
+          white-space: pre; /* keep formatting for code */
+          tab-size: 4;
+          page-break-inside: avoid;
+          -webkit-hyphens: none; hyphens: none;
+        }
+
+        /* Optional wrapping variant (not used by default) */
+        pre.wrap { white-space: pre-wrap; word-break: break-word; }
+
+        /* Inline code: dark-ish chip, but subtle */
+        code {
+          font-family: var(--font-mono), monospace;
+          font-size: 0.92em;
+          background: #020617;
+          color: #e5e7eb;
+          padding: 0.06rem 0.28rem;
+          border-radius: 3px;
+        }
+
+        /* Optional: language label inside code block (if added later) */
+        .code-meta { display: inline-block; font-size: 0.78rem; color: var(--color-muted); margin-bottom: 0.35rem; }
+
+        /* Small utilities and labels */
+        .label { display: inline-block; font-size: 0.82rem; color: var(--color-accent); background: rgba(25,103,210,0.06); padding: 0.08rem 0.3rem; border-radius: 3px; border: 1px solid rgba(25,103,210,0.06); }
+
+        /* Horizontal rule */
+        hr { border: 0; border-top: 1px solid var(--color-border); margin: 1.2rem 0; }
+
+        /* Links */
+        a { color: var(--color-accent); text-decoration: underline; }
+        a:visited { color: #164fb0; }
+
+        /* Page-break helpers for PDF */
+        header, footer, article, section, table, pre, blockquote, img, figure { break-inside: avoid; page-break-inside: avoid; -webkit-column-break-inside: avoid; }
+        h1, h2 { break-after: avoid; break-before: avoid; }
+
+        /* Print-specific adjustments */
+        @media print {
+          body { color: #000; background: #fff; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+          .page { padding: 0; }
+          /* keep code dark but slightly lighter for print */
+          pre { background: #111827; border-color: #1f2937; }
+          .diagram-placeholder { background: transparent; }
+          /* show URLs after links for printed copies */
+          a[href]:after { content: " (" attr(href) ")"; font-size: 0.85em; color: var(--color-muted); }
+        }
+
+        /* Small-screen fallbacks for browser view */
+        @media (max-width: 640px) {
+          :root { --page-margin: 12px; }
+          .page { padding: 12px; }
+          pre { font-size: 0.8rem; }
+          h1 { font-size: 1.5rem; }
+        }
+
+    </style>
+</head>
+<body>
+<div class="page">
+    <header class="doc-header">
+        <div class="doc-logo-wrap"><img src="logo.png" alt="SECURAA logo" class="doc-logo" /></div>
+    </header>
+    <h1>Comprehensive Secure SDLC for SECURAA SOAR Platform</h1>
+    <hr>
+    <h2>Document Control</h2>
+    <table>
+        <thead>
+        <tr>
+            <th><strong>Attribute</strong></th>
+            <th><strong>Value</strong></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><strong>Document Title</strong></td>
+            <td>SECURAA Secure SDLC Process</td>
+        </tr>
+        <tr>
+            <td><strong>Document ID</strong></td>
+            <td>SECURAA-SDLC-MASTER-001</td>
+        </tr>
+        </tbody>
+    </table>
+    <hr>
+
+    <h2>Table of Contents</h2>
+    <div class="table-of-contents">
+        <ol>
+            <li><a href="#executive-summary">Executive Summary</a></li>
+            <li><a href="#technology-stack">Technology Stack</a></li>
+            <li><a href="#repository-structure">Repository Structure</a></li>
+            <li><a href="#phase-1-requirements--planning">Phase 1: Requirements &amp; Planning</a></li>
+            <li><a href="#phase-2-secure-design">Phase 2: Secure Design</a></li>
+            <li><a href="#phase-3-secure-development">Phase 3: Secure Development</a></li>
+            <li><a href="#phase-4-security-testing">Phase 4: Security Testing</a></li>
+            <li><a href="#phase-5-build--deployment">Phase 5: Build &amp; Deployment</a></li>
+            <li><a href="#phase-6-operations--monitoring">Phase 6: Operations &amp; Monitoring</a></li>
+            <li><a href="#phase-7-cicd-security-pipeline">Phase 7: CI/CD Security Pipeline</a></li>
+        </ol>
+    </div>
+    <hr>
+    <h2 id="executive-summary">Executive Summary</h2>
+    <p>This document describes the complete Secure Software Development Lifecycle (SDLC) implemented for the SECURAA Security Orchestration, Automation and Response (SOAR) platform. The SDLC integrates security at every phase from requirements gathering through production operations.</p>
+    <h3>Platform Overview</h3>
+
+    <p><strong>SECURAA</strong> is an enterprise SOAR platform with:</p>
+    <ul>
+        <li><strong>30+ Microservices</strong> in the zona_services repository</li>
+        <li><strong>300+ Third-Party Integrations</strong> in the integrations repository</li>
+        <li><strong>9 Primary Repositories</strong> managed via AWS CodeCommit</li>
+        <li><strong>Containerized Deployment</strong> using Docker and AWS ECR</li>
+        <li><strong>AWS Infrastructure</strong> with CodeBuild, ECR, IAM, CloudWatch</li>
+    </ul>
+    <h3>SDLC Workflow</h3>
+    <div class="diagram-placeholder">
+        <img src="sdlc.png" alt="SDLC Workflow Diagram" height="500" />
+    </div>
+    <hr>
+    <h2 id="technology-stack">Technology Stack</h2>
+    <h3>Programming Languages</h3>
+    <table>
+        <thead>
+        <tr>
+            <th>Language</th>
+            <th>Purpose</th>
+            <th>Version</th>
+            <th>Files/Services</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><strong>Go</strong></td>
+            <td>Backend microservices - APIs, Batch processing, integrations</td>
+            <td>1.17+</td>
+            <td>30+ services in zona_services, zona_batch, integrations</td>
+        </tr>
+        <tr>
+            <td><strong>HTML/CSS/JavaScript/React</strong></td>
+            <td>Frontend UI</td>
+            <td>React 18.2+</td>
+            <td>zonareact repository</td>
+        </tr>
+        <tr>
+            <td><strong>Python</strong></td>
+            <td>Utils</td>
+            <td>3.8+</td>
+            <td>securaa_pylib, custom_python-utils, custom_python-utils-trial</td>
+        </tr>
+        <tr>
+            <td><strong>Shell</strong></td>
+            <td>Build automation, deployment</td>
+            <td>Bash</td>
+            <td>build_securaa scripts</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <h3>Infrastructure Components</h3>
+
+    <p><strong>AWS Services in Use:</strong></p>
+    <ul>
+        <li><strong>AWS CodeCommit</strong> - Git repositories (9 repositories)</li>
+        <li><strong>AWS CodeBuild</strong> - CI/CD pipeline automation</li>
+        <li><strong>Amazon ECR</strong> - Docker image registry (xxxxxx.dkr.ecr.us-east-2.amazonaws.com)</li>
+        <li><strong>Amazon EC2</strong> - Application hosting</li>
+        <li><strong>AWS IAM</strong> - Access control and permissions</li>
+        <li><strong>AWS CloudWatch</strong> - Logging and monitoring</li>
+        <li><strong>AWS Secrets Manager</strong> - Credential storage</li>
+    </ul>
+
+    <p><strong>Databases:</strong></p>
+    <ul>
+        <li><strong>MongoDB 7.0</strong> - Primary database (mssp_core database)</li>
+        <li><strong>Redis</strong> - Secondary/Cache-Only database</li>
+        <li><strong>InfluxDB</strong> - Monitoring Dashboard's Time-series metrics</li>
+    </ul>
+
+    <p><strong>Container Platform:</strong></p>
+    <ul>
+        <li><strong>Docker</strong> - Containerization</li>
+        <li><strong>AWS ECR</strong> - Image registry</li>
+        <li><strong>Docker Compose</strong> - Local development</li>
+    </ul>
+
+    <hr>
+
+    <h2 id="repository-structure">Repository Structure</h2>
+
+    <p>SECURAA's codebase is organized across 9 specialized repositories in AWS CodeCommit:</p>
+
+    <h3>1. build_securaa Repository</h3>
+
+    <p><strong>Purpose</strong>: Build automation and deployment</p>
+
+    <p><strong>Key Components:</strong></p>
+    <pre><code>build_securaa/
+├── build_securaa.sh              # Main build orchestration script
+├── aws_codebuild/
+│   ├── Core_BuildSpec.yaml       # Core services build (zona_services, zona_batch)
+│   ├── Wrapper_BuildSpec.yaml    # Integration services build
+│   └── UI_BuildSpec.yaml         # Frontend build
+├── core_scripts/
+│   ├── functions_aws.sh          # AWS-specific build functions
+│   ├── functions.sh              # General build functions
+│   ├── securaa_ecr_login.sh      # ECR authentication
+│   └── docker_ecr_login.sh       # Docker ECR login
+├── deployment_scripts/           # Deployment automation
+├── pkg/                          # RPM package specifications
+└── securaa/                      # Core application code
+</code></pre>
+
+    <p><strong>Build Options</strong> (from build_securaa.sh):</p>
+    <ul>
+        <li><code>-i</code> Make core Docker images</li>
+        <li><code>-w</code> Make wrapper (integration) images</li>
+        <li><code>-u</code> Make UI build</li>
+        <li><code>-r</code> Make RPM packages</li>
+        <li><code>-a</code> Binary and zip export</li>
+        <li><code>-c</code> Checkout all repos</li>
+        <li><code>-s</code> Scan repositories</li>
+        <li><code>-b</code> Make batch images</li>
+    </ul>
+
+    <p><strong>Build Process:</strong></p>
+    <pre><code class="language-bash">./build_securaa.sh "-vi" $dev_image rpm_mssp_complete 0001 $dev_image
+</code></pre>
+
+    <h3>2. zona_services Repository</h3>
+
+    <p><strong>Purpose</strong>: Core microservices (30+ services)</p>
+
+    <p><strong>Service Categories:</strong></p>
+    <pre><code>zona_services/
+├── zona_user/                    # User management service
+├── zona_integrations/            # Integration orchestration
+├── zona_siem/                    # Incidents related services
+├── zona_playbook/                # Playbook execution engine
+├── zona_querybuilder/            # Query builder service
+├── zona_custom/                  # Custom utilities
+├── zona_custom_utils/            # Custom utility functions
+├── zona_apis_manager/            # API management
+├── zona_sshclient/               # SSH client service
+├── zona_pdf/                     # PDF generation service
+├── zona_primary_server_health_check/  # Primary Machine Health monitoring service
+└── zona_sia_apis/                # SIA API services
+</code></pre>
+
+    <p>Each service is independently deployable as a Docker container.</p>
+
+    <h3>3. securaa Repository</h3>
+
+    <p><strong>Purpose</strong>: Common functions/library used for Integrations</p>
+
+    <p><strong>Components:</strong></p>
+    <ul>
+        <li>API endpoints</li>
+        <li>Business logic layer</li>
+        <li>Database operations</li>
+        <li>Common utilities</li>
+    </ul>
+
+    <h3>4. securaa_lib Repository</h3>
+
+    <p><strong>Purpose</strong>: Shared library for core application</p>
+
+    <p><strong>Key Features:</strong></p>
+    <ul>
+        <li><strong>Encryption/Decryption</strong>: AES-256-CBC encryption implementation</li>
+        <li><strong>JWT Token Management</strong>: Token generation and validation</li>
+        <li><strong>Cryptographic Operations</strong>: Secure crypto functions</li>
+        <li><strong>Authentication Helpers</strong>: Common auth utilities</li>
+    </ul>
+
+    <h3>5. zona_batch Repository</h3>
+
+    <p><strong>Purpose</strong>: Background batch processing jobs</p>
+
+    <p><strong>Batch Services:</strong></p>
+    <pre><code>zona_batch/
+├── core_process_batch/           # Core data processing
+├── csam_connector/               # CSAM integration batch
+├── auto_purge_batch/             # Data retention enforcement
+├── report_batch/                 # Report generation
+├── sbot/                         # Security bot automation
+└── sla_breach_monitor_batch/     # SLA monitoring
+</code></pre>
+
+    <h3>6. integrations Repository</h3>
+
+    <p><strong>Purpose</strong>: Third-party system integrations (300+ integrations)</p>
+
+    <p><strong>Integration Categories:</strong></p>
+    <ul>
+        <li><strong>SIEM Platforms</strong>: Splunk, QRadar, LogRhythm, ArcSight</li>
+        <li><strong>Threat Intelligence</strong>: VirusTotal, AlienVault, ThreatConnect</li>
+        <li><strong>Ticketing Systems</strong>: ServiceNow, Jira, Remedy</li>
+        <li><strong>EDR/Endpoint</strong>: CrowdStrike, Carbon Black, SentinelOne</li>
+        <li><strong>Cloud Security</strong>: AWS Security Hub, Azure Sentinel, GCP SCC</li>
+        <li><strong>Network Security</strong>: Palo Alto, Cisco, Fortinet, Checkpoint</li>
+        <li><strong>Email Security</strong>: Proofpoint, Mimecast, Microsoft 365</li>
+        <li><strong>Identity</strong>: Active Directory, Okta, Azure AD</li>
+    </ul>
+
+    <p><strong>Integration Structure:</strong></p>
+    <pre><code>integrations/
+├── zona_splunk/
+├── zona_qradar/
+├── zona_servicenow/
+├── zona_virustotal/
+├── zona_crowdstrike/
+├── zona_aws_securityhub/
+└── ... (300+ integration modules)
+</code></pre>
+
+    <h3>7. zonareact Repository</h3>
+
+    <p><strong>Purpose</strong>: Frontend React application</p>
+
+    <p><strong>Technology:</strong></p>
+    <ul>
+        <li>React 18.2+</li>
+        <li>Redux for state management</li>
+        <li>Material-UI components</li>
+        <li>Chart visualizations</li>
+        <li>Real-time updates via WebSockets</li>
+    </ul>
+
+    <p><strong>Features:</strong></p>
+    <ul>
+        <li>User interface and dashboards</li>
+        <li>Case management UI</li>
+        <li>Playbook designer</li>
+        <li>Custom widgets</li>
+        <li>Report generation UI</li>
+    </ul>
+
+    <h3>8. securaa_db Repository</h3>
+
+    <p><strong>Purpose</strong>: Database schemas and migrations</p>
+
+    <p><strong>Contents:</strong></p>
+    <ul>
+        <li>MongoDB collection schemas</li>
+        <li>Database initialization scripts</li>
+        <li>Migration scripts</li>
+        <li>Seed data for development</li>
+        <li>Database versioning</li>
+    </ul>
+
+    <p><strong>Primary Database</strong>: <code>mssp_core</code> (MongoDB)</p>
+
+    <h3>9. securaa_pylib Repository</h3>
+
+    <p><strong>Purpose</strong>: Python utility libraries</p>
+
+    <p><strong>Components:</strong></p>
+    <ul>
+        <li>Python utilities for custom integrations</li>
+        <li>Data processing libraries</li>
+        <li>Helper functions for playbooks</li>
+    </ul>
+
+    <hr>
+
+    <h2 id="phase-1-requirements--planning">Phase 1: Requirements &amp; Planning</h2>
+
+    <h3>Objective</h3>
+
+    <p>Define requirements, assess risks, and model threats before development begins.</p>
+
+    <h3>Requirements Gathering</h3>
+
+    <p>Document requirements for each feature:</p>
+
+    <pre><code class="language-yaml">security_requirements:
+  authentication:
+    - Authentication method (JWT, OAuth, API Key)
+    - Session management requirements
+    - MFA requirements for sensitive operations
+
+  authorization:
+    - Role definitions
+    - Permission model
+    - Resource access controls
+
+  data_protection:
+    - Sensitive data identification
+    - Encryption requirements (AES-256-CBC as per securaa_lib)
+    - Data classification levels
+    - Retention and deletion policies
+
+  input_validation:
+    - Input validation rules
+    - Data type and format requirements
+    - Size limits
+    - Sanitization requirements
+
+  audit_logging:
+    - Security events to log
+    - Log retention period (CloudWatch)
+    - Log format requirements
+    - SIEM integration requirements
+</code></pre>
+
+    <hr>
+
+    <h2 id="phase-2-secure-design">Phase 2: Secure Design</h2>
+
+    <h3>Objective</h3>
+
+    <p>Translate requirements into technical architecture with built-in security controls.</p>
+
+    <h3>Activities</h3>
+
+    <h4>2.1 Architecture Design</h4>
+
+    <p><strong>Microservices Architecture (Simplified):</strong></p>
+
+    <div class="diagram-placeholder">
+       <img src="micro_services.png" alt="Microservices Architecture Diagram" height="280" />
+    </div>
+
+    <h4>2.2 Security Controls Design</h4>
+
+    <p><strong>Authentication Design:</strong></p>
+    <pre><code class="language-yaml">authentication:
+  primary_method: JWT
+  algorithm: HS256
+  token_expiry: 3600 seconds
+  refresh_token_expiry: 604800 seconds  # 7 days
+  secret_storage: AWS Secrets Manager
+
+  api_key_method:
+    format: "securaa_api_[32_char_random]"
+    storage: Hashed with bcrypt
+
+  mfa:
+    methods: [TOTP, SMS, Email]
+    required_for: Administrative operations
+</code></pre>
+
+    <p><strong>Authorization Design:</strong></p>
+    <pre><code class="language-yaml">authorization:
+  model: Role-Based Access Control (RBAC)
+  roles:
+    - admin:
+        - Full system access
+        - User management
+        - Configuration changes
+
+    - analyst:
+        - Case management
+        - Integration execution
+        - Report access
+
+    - viewer:
+        - Read-only access
+        - Report viewing
+</code></pre>
+
+    <p><strong>Data Protection Design:</strong></p>
+    <pre><code class="language-yaml">encryption:
+  at_rest:
+    algorithm: AES-256-CBC
+    implementation: securaa_lib.CredentialsEncryptV2()
+    key_storage: AWS Secrets Manager
+
+    encrypted_fields:
+      - integration_credentials
+      - api_tokens
+      - user_passwords
+
+  in_transit:
+    protocol: TLS 1.2+
+    certificate_provider: AWS Certificate Manager
+    enforce_https: true
+</code></pre>
+
+    <h4>2.3 Database Security Design</h4>
+
+    <p><strong>MongoDB Configuration:</strong></p>
+    <pre><code class="language-yaml">mongodb:
+  database: mssp_core
+  authentication:
+    enabled: true
+    mechanism: SCRAM-SHA-256
+
+  authorization:
+    role_based: true
+    users:
+      - securaa_app: readWrite access
+      - securaa_readonly: read access
+
+  network:
+    bind_ip: Private subnet only
+    port: 27017
+
+  collections:
+    - integrations
+    - cases
+    - playbooks
+    - users
+    - audit_logs
+</code></pre>
+
+    <h4>2.4 AWS Infrastructure Design</h4>
+
+    <p><strong>VPC Architecture:</strong></p>
+    <pre><code class="language-yaml">vpc:
+  cidr: 10.0.0.0/16
+
+  subnets:
+    public:
+      cidr: 10.0.1.0/24
+      components:
+        - Application Load Balancer
+        - NAT Gateway
+
+    private:
+      cidr: 10.0.2.0/24
+      components:
+        - EC2 instances (zona_services)
+        - Application containers
+
+    database:
+      cidr: 10.0.3.0/24
+      components:
+        - MongoDB cluster
+        - PostgreSQL
+</code></pre>
+
+    <p><strong>Security Groups:</strong></p>
+    <pre><code class="language-yaml">security_groups:
+  alb_sg:
+    inbound:
+      - port: 443, source: 0.0.0.0/0 (HTTPS)
+      - port: 80, source: 0.0.0.0/0 (HTTP redirect)
+    outbound:
+      - port: 8080, destination: app_sg
+
+  app_sg:
+    inbound:
+      - port: 8080, source: alb_sg
+      - port: 22, source: bastion_sg (SSH)
+    outbound:
+      - port: 27017, destination: db_sg (MongoDB)
+      - port: 443, destination: 0.0.0.0/0 (External APIs)
+
+  db_sg:
+    inbound:
+      - port: 27017, source: app_sg (MongoDB)
+    outbound: []
+</code></pre>
+
+    <p><strong>IAM Roles and Policies:</strong></p>
+    <pre><code class="language-yaml">iam_roles:
+  SecuraaCodeBuildRole:
+    purpose: AWS CodeBuild service role
+    permissions:
+      - ecr:GetAuthorizationToken
+      - ecr:BatchCheckLayerAvailability
+      - ecr:PutImage
+      - ecr:InitiateLayerUpload
+      - ecr:UploadLayerPart
+      - ecr:CompleteLayerUpload
+      - s3:GetObject
+      - s3:PutObject (securaa-artifacts bucket)
+      - logs:CreateLogGroup
+      - logs:CreateLogStream
+      - logs:PutLogEvents
+      - secretsmanager:GetSecretValue (securaa/* secrets)
+
+  SecuraaEC2AppRole:
+    purpose: EC2 application instances
+    permissions:
+      - ecr:GetAuthorizationToken
+      - ecr:BatchGetImage
+      - ecr:GetDownloadUrlForLayer
+      - secretsmanager:GetSecretValue (securaa/prod/*)
+      - logs:CreateLogGroup
+      - logs:CreateLogStream
+      - logs:PutLogEvents
+      - cloudwatch:PutMetricData
+</code></pre>
+
+    <h3>Deliverables</h3>
+
+    <ul>
+        <li>Architecture diagrams (component, data flow, network)</li>
+        <li>Security controls specification</li>
+        <li>Database security design</li>
+        <li>API security specifications</li>
+        <li>Infrastructure security design</li>
+        <li>IAM policies and roles</li>
+        <li>Security design review approval</li>
+    </ul>
+
+    <hr>
+
+    <h2 id="phase-3-secure-development">Phase 3: Secure Development</h2>
+
+    <h3>Objective</h3>
+
+    <p>Implement secure code following secure coding standards with Git workflow on AWS CodeCommit.</p>
+
+    <h3>Activities</h3>
+
+    <h4>3.1 AWS CodeCommit Setup</h4>
+
+    <p><strong>Repository Access:</strong></p>
+    <pre><code class="language-yaml">codecommit_repositories:
+  - build_securaa
+  - zona_services
+  - securaa
+  - securaa_lib
+  - zona_batch
+  - integrations
+  - zonareact
+  - securaa_db
+  - securaa_pylib
+
+authentication:
+  methods:
+    - HTTPS with Git credentials
+    - SSH keys
+    - AWS CLI with IAM credentials
+
+iam_policy:
+  read_permissions:
+    - codecommit:GetRepository
+    - codecommit:GetBranch
+    - codecommit:GitPull
+
+  write_permissions:
+    - codecommit:GitPush
+    - codecommit:CreateBranch
+    - codecommit:CreatePullRequest
+
+  admin_permissions:
+    - codecommit:MergePullRequest (requires reviewer role)
+</code></pre>
+
+    <p><strong>Branch Protection:</strong></p>
+    <pre><code class="language-yaml">protected_branches:
+  main:
+    require_pull_request: true
+    required_approvals: 2
+    restrict_push: true
+
+  release:
+    require_pull_request: true
+    required_approvals: 1
+    require_status_checks: true
+
+  dev:
+    require_pull_request: true
+    required_approvals: 1
+</code></pre>
+
+    <h4>3.2 Branching Strategy</h4>
+
+    <pre><code class="language-yaml">branch_naming:
+  feature: "feature/[JIRA-ID]-short-description"
+  bugfix: "bugfix/[JIRA-ID]-short-description"
+  hotfix: "hotfix/[JIRA-ID]-short-description"
+  release: "release/v[version]"
+
+workflow:
+  1: Create feature branch from dev
+  2: Implement feature
+  3: Dev unit testing &amp; security testing
+  4: Push to CodeCommit
+  5: Create pull request
+  6: Code review
+  7: Merge to dev
+  8: Integration testing
+  9: QA team testing
+  10: Merge to release branch post final load testing
+</code></pre>
+
+    <h4>3.3 Code Review Process</h4>
+
+    <p><strong>Pull Request Template:</strong></p>
+    <pre><code class="language-markdown">## Description
+[JIRA-ID]: Brief description
+
+## Security Considerations
+- [ ] No hardcoded credentials
+- [ ] Input validation implemented
+- [ ] Using securaa_lib for encryption
+- [ ] Proper error handling
+- [ ] Security events logged
+- [ ] Authentication/authorization enforced
+
+## Testing
+- [ ] Manual testing completed
+- [ ] Security tests included
+
+## Security Scan Results
+- [ ] GoSec: Pass
+- [ ] Dependency scan: Pass
+
+## Reviewers
+@security-team @team-lead
+</code></pre>
+
+    <p><strong>Code Review Checklist:</strong></p>
+    <ul>
+        <li>Authentication implemented correctly</li>
+        <li>Authorization checks present</li>
+        <li>Input validation comprehensive</li>
+        <li>Sensitive data encrypted using securaa_lib</li>
+        <li>Error messages don't expose details</li>
+        <li>No credentials in code</li>
+        <li>Logging doesn't contain PII</li>
+        <li>Manual tests cover security scenarios</li>
+        <li>Code follows SECURAA standards</li>
+    </ul>
+
+    <h3>Deliverables</h3>
+
+    <ul>
+        <li>Code in feature branch</li>
+        <li>Security tests</li>
+        <li>Pull request created</li>
+        <li>Code review completed</li>
+        <li>Approved by 2 seniors</li>
+        <li>Merged to dev branch</li>
+    </ul>
+
+    <hr>
+
+    <h2 id="phase-4-security-testing">Phase 4: Security Testing</h2>
+
+    <h3>Objective</h3>
+
+    <p>Validate security controls through automated and manual security testing.</p>
+
+    <h3>Activities</h3>
+
+    <h4>4.1 Static Application Security Testing (SAST)</h4>
+
+    <p><strong>GoSec Configuration:</strong></p>
+    <pre><code class="language-yaml"># .gosec.yml
+{
+  "global": {
+    "nosec": false,
+    "show-ignored": true,
+    "confidence": "medium",
+    "severity": "medium"
+  },
+  "rules": {
+    "G101": "Look for hardcoded credentials",
+    "G104": "Audit errors not checked",
+    "G201": "SQL query construction using string building",
+    "G401": "Detect MD5 usage",
+    "G501": "Import blocklist: crypto/md5"
+  }
+}
+</code></pre>
+
+    <p><strong>Run GoSec:</strong></p>
+    <pre><code class="language-bash"># Install
+go install github.com/securego/gosec/v2/cmd/gosec@latest
+
+# Run scan
+gosec -fmt=json -out=gosec-report.json ./...
+
+# Check for critical issues
+gosec -severity=high ./...
+</code></pre>
+
+    <h4>4.2 Dependency Vulnerability Scanning</h4>
+
+    <p><strong>govulncheck for Go:</strong></p>
+    <pre><code class="language-bash"># Install
+go install golang.org/x/vuln/cmd/govulncheck@latest
+
+# Run vulnerability check
+govulncheck ./...
+</code></pre>
+
+    <h4>4.4 Container Security Scanning</h4>
+
+    <p><strong>AWS ECR for Docker Image scan</strong></p>
+
+    <h3>Deliverables</h3>
+
+    <ul>
+        <li>GoSec scan completed &amp; Security reports generated</li>
+        <li>Critical/High issues resolved</li>
+        <li>Dependency scans completed</li>
+        <li>Container scans completed</li>
+        <li>Security test approval</li>
+    </ul>
+
+    <hr>
+
+    <h2 id="phase-5-build--deployment">Phase 5: Build &amp; Deployment</h2>
+
+    <h3>Objective</h3>
+
+    <p>Build secure artifacts and deploy to production using AWS CodeBuild and ECR.</p>
+
+    <h3>Activities</h3>
+
+    <h4>5.1 AWS CodeBuild Configuration</h4>
+
+    <p><strong>Core_BuildSpec.yaml</strong> (Actual configuration from repository):</p>
+    <pre><code class="language-yaml">version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - echo CODEBUILD_SRC_DIR - $CODEBUILD_SRC_DIR
+      - cd ..
+      - pwd
+      - wget --no-check-certificate https://xxxxxx/code_dependency/github.com.zip
+      - wget --no-check-certificate https://xxxxxx/code_dependency/gopkg.in.zip
+      - ls
+      - unzip github.com.zip
+      - unzip gopkg.in.zip
+      - echo "After Unziping"
+      - ls
+      - pwd
+
+  build:
+    commands:
+      - export GO111MODULE=on
+      - export TAG_IMAGE=$dev_image
+      - echo $TAG_IMAGE
+      - go env
+      - cd build_securaa
+      - echo "Below are the build_securaa folders"
+      - ls
+      - echo "Entering in Core Script Folder"
+      - cd core_scripts/
+      - ls
+      - chmod 777 *
+      - ls -l
+      - sudo ./securaa_ecr_login.sh
+      - pwd
+      - ls
+      - cd ../
+      - chmod 777 build_securaa.sh
+      - export app=aws
+      - echo "The value of app is $app"
+      - ls -l
+      - echo $GOPATH
+      - echo $GOROOT
+      - ./build_securaa.sh "-vi" $dev_image rpm_mssp_complete 0001 $dev_image
+</code></pre>
+
+    <p><strong>Wrapper_BuildSpec.yaml</strong> (Integration services):</p>
+    <pre><code class="language-yaml">version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - echo CODEBUILD_SRC_DIR - $CODEBUILD_SRC_DIR
+      - cd ..
+      - pwd
+      - wget --no-check-certificate https://xxxxxx/code_dependency/github.com.zip
+      - wget --no-check-certificate https://xxxxxx/code_dependency/gopkg.in.zip
+      - ls
+      - unzip github.com.zip
+      - unzip gopkg.in.zip
+      - echo "After Unziping"
+      - ls
+      - pwd
+
+  build:
+    commands:
+      - export GO111MODULE=on
+      - export TAG_IMAGE=$dev_image
+      - echo $TAG_IMAGE
+      - go env
+      - cd build_securaa
+      - echo "Below are the build_securaa folders"
+      - ls
+      - echo "Entering in Core Script Folder"
+      - cd core_scripts/
+      - ls
+      - chmod 777 *
+      - ls -l
+      - sudo ./securaa_ecr_login.sh
+      - pwd
+      - ls
+      - cd ../
+      - chmod 777 build_securaa.sh
+      - export app=aws
+      - echo "The value of app is $app"
+      - ls -l
+      - echo $GOPATH
+      - echo $GOROOT
+      - ./build_securaa.sh "-vw" $dev_image rpm_mssp_complete 0001 $dev_image
+</code></pre>
+
+    <h4>5.2 Build Process</h4>
+
+    <p><strong>build_securaa.sh Options</strong> (from repository):</p>
+
+    <pre><code class="language-bash"># Build core services and push to ECR
+./build_securaa.sh "-vi" [TAG_IMAGE] rpm_mssp_complete [BUILD_NUMBER] [TAG_IMAGE]
+
+# Build integration services
+./build_securaa.sh "-vw" [TAG_IMAGE] rpm_mssp_complete [BUILD_NUMBER] [TAG_IMAGE]
+
+# Build UI
+./build_securaa.sh "-vu" [TAG_IMAGE] rpm_mssp_complete [BUILD_NUMBER] [TAG_IMAGE]
+
+# Options:
+# -v  Verbose mode
+# -i  Make core images (zona_services, zona_batch)
+# -w  Make wrapper images (integrations)
+# -u  Make UI build (zonareact)
+# -r  Make RPM packages
+# -a  Binary and zip export
+# -c  Checkout all repos
+# -s  Scan repositories
+# -b  Make batch images
+</code></pre>
+
+    <p><strong>Build Functions</strong> (from functions_aws.sh):</p>
+    <ul>
+        <li><code>build_push_images()</code> - Build and push core service images</li>
+        <li><code>build_push_wrapper_images()</code> - Build and push integration images</li>
+        <li><code>make_ecr_login()</code> - Authenticate to AWS ECR</li>
+        <li><code>ui_build()</code> - Build React frontend</li>
+    </ul>
+
+    <h4>5.3 AWS ECR Configuration</h4>
+
+    <p><strong>ECR Registry:</strong></p>
+    <pre><code>xxxxxx.dkr.ecr.us-east-2.amazonaws.com
+</code></pre>
+
+    <p><strong>ECR Repositories:</strong></p>
+    <ul>
+        <li>securaa/zona_user</li>
+        <li>securaa/zona_integrations</li>
+        <li>securaa/zona_siem</li>
+        <li>securaa/zona_playbook</li>
+        <li>securaa/zona_batch</li>
+        <li>securaa/zonareact</li>
+        <li>... (one per service)</li>
+    </ul>
+
+    <p><strong>ECR Security Features:</strong></p>
+    <pre><code class="language-yaml">ecr_configuration:
+  image_scanning:
+    scan_on_push: true
+    severity_threshold: HIGH
+
+  encryption:
+    type: KMS
+    kms_key: securaa-ecr-key
+
+  image_tag_mutability: IMMUTABLE
+
+  lifecycle_policy:
+    - Keep last 10 production images
+    - Remove untagged images after 7 days
+</code></pre>
+
+    <p><strong>ECR Authentication:</strong></p>
+    <pre><code class="language-bash">#!/bin/bash
+# From securaa_ecr_login.sh
+
+aws ecr get-login-password --region us-east-2 | \
+  docker login --username AWS --password-stdin \
+  xxxxxx.dkr.ecr.us-east-2.amazonaws.com
+</code></pre>
+
+    <h4>5.4 Container Security</h4>
+
+    <p><strong>Secure Dockerfile Pattern:</strong></p>
+    <pre><code class="language-dockerfile"># Multi-stage build
+FROM golang:1.17-alpine AS builder
+
+# Create non-root user
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+
+WORKDIR /app
+COPY go.mod go.sum ./
+RUN go mod download && go mod verify
+
+COPY ../../Downloads .
+RUN CGO_ENABLED=0 GOOS=linux go build -o main .
+
+# Final stage - minimal image
+FROM alpine:3.18
+
+# Install security updates
+RUN apk --no-cache add ca-certificates && \
+    apk --no-cache upgrade
+
+# Create non-root user
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+USER appuser
+
+WORKDIR /home/appuser
+COPY --from=builder --chown=appuser:appgroup /app/main .
+
+EXPOSE 8080
+
+HEALTHCHECK --interval=30s --timeout=3s \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:8080/health || exit 1
+
+CMD ["./main"]
+</code></pre>
+
+    <h4>5.5 Deployment Automation</h4>
+
+    <p><strong>Deployment Process:</strong></p>
+    <pre><code class="language-yaml">deployment_flow:
+  1_build:
+    - CodeBuild triggered on daily basis for nightly builds
+    - Dependencies downloaded from securaa repo public link
+    - Go modules vendored (GO111MODULE=on)
+    - Services built
+    - Docker images created
+
+  2_scan:
+    - Container images scanned
+    - Vulnerabilities checked
+    - Scan results reviewed
+
+  3_push:
+    - Images tagged with build number
+    - Push to ECR registry
+    - Image signing
+
+  4_deploy_on_nightly:
+    - Update EC2 instances
+    - Pull new images from ECR
+    - Rolling deployment
+    - Health checks
+
+  5_verify:
+    - Service health checks
+    - Integration tests
+    - Monitoring validation
+</code></pre>
+
+    <h3>Deliverables</h3>
+
+    <ul>
+        <li>CodeBuild project configured</li>
+        <li>Build scripts tested</li>
+        <li>Docker images built</li>
+        <li>Container scans passed</li>
+        <li>Images pushed to ECR</li>
+        <li>Deployment successful</li>
+        <li>Health checks passing</li>
+    </ul>
+
+    <hr>
+
+    <h2 id="phase-6-operations--monitoring">Phase 6: Operations &amp; Monitoring</h2>
+
+    <h3>Objective</h3>
+
+    <p>Monitor the development systems and track overall server resource utilization.</p>
+
+    <h3>Activities</h3>
+
+    <h4>6.1 CloudWatch Metrics</h4>
+
+    <p><strong>Application Metrics:</strong></p>
+    <pre><code class="language-yaml">metrics:
+  authentication:
+    - AuthenticationSuccess (count)
+    - AuthenticationFailure (count)
+    - AuthenticationLatency (milliseconds)
+
+  api:
+    - APIRequestCount (count)
+    - API4xxErrors (count)
+    - API5xxErrors (count)
+    - APILatency (milliseconds)
+
+  integrations:
+    - IntegrationExecutions (count)
+    - IntegrationFailures (count)
+    - IntegrationLatency (milliseconds)
+
+  system:
+    - CPUUtilization (percent)
+    - MemoryUtilization (percent)
+    - DiskUtilization (percent)
+</code></pre>
+
+    <h4>6.2 Alerting Configuration</h4>
+
+    <p><strong>CloudWatch Alarms:</strong></p>
+    <pre><code class="language-yaml">alarms:
+  high_authentication_failures:
+    metric: ResourceUtilization
+    threshold: 50
+    period: 300  # 5 minutes
+    comparison: GreaterThanThreshold
+    action: SNS notification to engineering team
+
+  critical_api_errors:
+    metric: API5xxErrors
+    threshold: 100
+    period: 300
+    evaluation_periods: 2
+    action: SNS notification to ops team
+
+  unauthorized_access:
+    metric: API403Errors
+    threshold: 30
+    period: 300
+    action: SNS notification to engineering team
+</code></pre>
+
+    <h3>Deliverables</h3>
+
+    <ul>
+        <li>CloudWatch logging configured</li>
+        <li>Metrics dashboards created</li>
+        <li>Alarms configured</li>
+    </ul>
+
+    <hr>
+
+    <h2 id="phase-7-cicd-security-pipeline">Phase 7: CI/CD Security Pipeline</h2>
+
+    <h3>Objective</h3>
+
+    <p>Integrate automated security checks throughout the CI/CD pipeline.</p>
+
+    <h3>Activities</h3>
+
+    <h4>7.1 Security Gates</h4>
+
+    <p><strong>Gate Configuration:</strong></p>
+    <pre><code class="language-yaml">security_gates:
+  gate_1_sast:
+    name: "Static Analysis"
+    fail_on_finding: false
+    tools: [gosec]
+    criteria:
+      max_critical: 0
+      max_high: 10
+    action: "Fail build if criteria not met"
+
+  gate_2_dependencies:
+    name: "Dependency Vulnerabilities"
+    fail_on_finding: false
+    tools: [govulncheck]
+    criteria:
+      max_critical_cvss: 0  # No CVSS &gt;= 9.0
+      max_high_cvss: 5       # Max 5 with CVSS &gt;= 7.0
+    action: "Fail build if critical vulnerabilities"
+
+  gate_3_container:
+    name: "Container Security"
+    fail_on_finding: false
+    tools: [trivy]
+    criteria:
+      max_critical: 0
+      max_high: 5
+    action: "Block ECR push"
+</code></pre>
+
+    <hr>
+
+    <h2>Security Tools Reference</h2>
+
+    <h3>Tools Used in SDLC</h3>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Tool</th>
+            <th>Purpose</th>
+            <th>Phase</th>
+            <th>Implementation</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><strong>GoSec</strong></td>
+            <td>Go SAST</td>
+            <td>Development, Testing</td>
+            <td><code>gosec ./...</code></td>
+        </tr>
+        <tr>
+            <td><strong>govulncheck</strong></td>
+            <td>Go vulnerability check</td>
+            <td>Testing</td>
+            <td><code>govulncheck ./...</code></td>
+        </tr>
+        <tr>
+            <td><strong>AWS CodeBuild</strong></td>
+            <td>CI/CD</td>
+            <td>Build</td>
+            <td>BuildSpec files</td>
+        </tr>
+        <tr>
+            <td><strong>AWS ECR</strong></td>
+            <td>Container registry</td>
+            <td>Build, Deploy</td>
+            <td>ECR API</td>
+        </tr>
+        <tr>
+            <td><strong>CloudWatch</strong></td>
+            <td>Logging, Monitoring</td>
+            <td>Operations</td>
+            <td>AWS SDK</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <h3>Security Tool Installation</h3>
+
+    <pre><code class="language-bash"># Go security tools
+go install github.com/securego/gosec/v2/cmd/gosec@latest
+go install golang.org/x/vuln/cmd/govulncheck@latest
+</code></pre>
+
+    <hr>
+
+    <h2>Roles &amp; Responsibilities</h2>
+
+    <h3>Development Team</h3>
+    <ul>
+        <li>Follow secure coding standards</li>
+        <li>Write security-focused unit tests</li>
+        <li>Participate in code reviews</li>
+        <li>Address security findings promptly</li>
+        <li>Use securaa_lib for encryption</li>
+    </ul>
+
+    <h3>Senior Engineering Team</h3>
+    <ul>
+        <li>Define security requirements</li>
+        <li>Review security architecture</li>
+        <li>Approve production deployments</li>
+    </ul>
+
+    <h3>DevOps Team</h3>
+    <ul>
+        <li>Maintain CI/CD pipeline (CodeBuild)</li>
+        <li>Manage AWS infrastructure</li>
+        <li>Configure security tools</li>
+        <li>Monitor system health</li>
+        <li>Manage ECR and deployments</li>
+    </ul>
+
+    <h3>QA Team</h3>
+    <ul>
+        <li>Execute test cases</li>
+        <li>Perform SAST scanning</li>
+        <li>Validate security requirements</li>
+        <li>Document security issues</li>
+    </ul>
+
+    <hr>
+
+    <h2>Summary</h2>
+
+    <p>This document provides a comprehensive overview of the SECURAA Secure SDLC process, covering all phases from requirements gathering through production operations. The SDLC integrates security at every stage using:</p>
+
+    <ul>
+        <li><strong>AWS Infrastructure</strong>: CodeCommit, CodeBuild, ECR, IAM, CloudWatch</li>
+        <li><strong>Security Tools</strong>: GoSec, govulncheck</li>
+        <li><strong>Secure Coding</strong>: securaa_lib encryption, input validation, secure error handling</li>
+        <li><strong>Automated Security</strong>: CodeBuild security scans, container scanning</li>
+        <li><strong>Comprehensive Monitoring</strong>: CloudWatch logging, metrics, alerting</li>
+    </ul>
+
+    <h3>Key Artifacts</h3>
+
+    <p><strong>Repositories:</strong></p>
+    <ol>
+        <li>build_securaa - Build automation</li>
+        <li>zona_services - 30+ microservices</li>
+        <li>securaa - Common functions/library used for Integrations</li>
+        <li>securaa_lib - Shared library for core application</li>
+        <li>zona_batch - Batch processing</li>
+        <li>integrations - 300+ integrations</li>
+        <li>zonareact - React frontend</li>
+        <li>securaa_db - Database schemas</li>
+        <li>securaa_pylib - Python utilities</li>
+    </ol>
+
+    <p><strong>Build System:</strong></p>
+    <ul>
+        <li>Core_BuildSpec.yaml - Core services</li>
+        <li>Wrapper_BuildSpec.yaml - Integration services</li>
+        <li>build_securaa.sh - Build orchestration</li>
+        <li>ECR Registry: xxxxxx.dkr.ecr.us-east-2.amazonaws.com</li>
+    </ul>
+
+    <p><strong>Security Features:</strong></p>
+    <ul>
+        <li>AES-256-CBC encryption (securaa_lib)</li>
+        <li>JWT authentication</li>
+        <li>MongoDB SCRAM-SHA-256 auth</li>
+        <li>TLS 1.2+ for transit</li>
+        <li>IAM policies (least privilege)</li>
+        <li>Container security scanning</li>
+        <li>Automated vulnerability detection</li>
+    </ul>
+    <hr>
+    <b>[END OF DOCUMENT]</b>
+</div>
+</body>
+</html>
